@@ -1,0 +1,81 @@
+.header {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 40rem;
+}
+
+.center {
+  margin-inline: auto;
+  text-align: center;
+  justify-items: center;
+}
+
+.left {
+  text-align: left;
+  justify-items: start;
+}
+
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bobo-gold-muted);
+}
+
+.light .eyebrow {
+  color: var(--bobo-gold-muted);
+}
+
+.dark .eyebrow {
+  color: var(--bobo-gold);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.light .title {
+  color: var(--bobo-ink);
+}
+
+.dark .title {
+  color: var(--bobo-white);
+}
+
+.rule {
+  width: 3.25rem;
+  height: 2px;
+  border: 0;
+  margin: 0;
+  background: linear-gradient(90deg, var(--bobo-gold), transparent);
+}
+
+.center .rule {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--bobo-gold),
+    transparent
+  );
+  width: 4.5rem;
+}
+
+.description {
+  font-size: var(--text-md);
+  line-height: 1.65;
+  max-width: 34rem;
+}
+
+.light .description {
+  color: var(--bobo-muted);
+}
+
+.dark .description {
+  color: rgba(255, 255, 255, 0.72);
+}

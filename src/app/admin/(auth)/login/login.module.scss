@@ -1,0 +1,169 @@
+@use "../../../../styles/mixins" as *;
+
+.page {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem var(--gutter);
+  background:
+    radial-gradient(ellipse 50% 40% at 20% 10%, rgba(74, 20, 140, 0.28), transparent 55%),
+    radial-gradient(ellipse 35% 30% at 90% 80%, rgba(212, 175, 55, 0.08), transparent 50%),
+    #0b090d;
+  color: #f4f0ea;
+}
+
+.back {
+  position: absolute;
+  top: 1.25rem;
+  left: var(--gutter);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(244, 240, 234, 0.55);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-soft);
+}
+
+.back:hover {
+  color: var(--bobo-gold);
+}
+
+.panel {
+  width: min(100%, 26rem);
+  padding: 2rem 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 40%),
+    #131015;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  h1 {
+    margin: 0.15rem 0 0;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bobo-gold);
+}
+
+.copy {
+  margin: 0 0 1.75rem;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: rgba(244, 240, 234, 0.55);
+  line-height: 1.55;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+
+  span {
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(244, 240, 234, 0.5);
+  }
+
+  input {
+    height: 2.75rem;
+    padding-inline: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    outline: none;
+    transition: border-color var(--duration-fast) var(--ease-soft);
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.28);
+    }
+
+    &:focus {
+      border-color: rgba(212, 175, 55, 0.55);
+    }
+  }
+}
+
+.passwordWrap {
+  position: relative;
+
+  input {
+    width: 100%;
+    padding-right: 2.75rem;
+  }
+}
+
+.eyeBtn {
+  position: absolute;
+  top: 50%;
+  right: 0.45rem;
+  transform: translateY(-50%);
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: rgba(244, 240, 234, 0.55);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-soft);
+}
+
+.eyeBtn:hover,
+.eyeBtn[aria-pressed="true"] {
+  color: var(--bobo-gold);
+}
+
+.eyeBtn:focus-visible {
+  outline: 2px solid var(--bobo-gold);
+  outline-offset: 2px;
+}
+
+.error {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: rgba(140, 40, 40, 0.2);
+  border: 1px solid rgba(200, 80, 80, 0.35);
+  color: #ffc0c0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+}
+

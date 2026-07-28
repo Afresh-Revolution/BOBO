@@ -1,0 +1,42 @@
+.btn {
+  position: fixed;
+  right: max(1rem, var(--gutter));
+  bottom: 1.25rem;
+  z-index: 90;
+  width: 2.85rem;
+  height: 2.85rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--bobo-ink);
+  background: var(--bobo-gold);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition:
+    opacity var(--duration) var(--ease-out),
+    transform var(--duration) var(--ease-out),
+    background var(--duration-fast) var(--ease-soft);
+}
+
+.btn:hover {
+  background: var(--bobo-gold-bright);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--bobo-gold);
+  outline-offset: 3px;
+}
+
+.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+}

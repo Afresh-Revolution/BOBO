@@ -1,0 +1,118 @@
+.wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  background: #121014;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+
+  th,
+  td {
+    padding: 0.9rem 1.1rem;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  th {
+    font-family: var(--font-ui);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+    white-space: nowrap;
+  }
+
+  td {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.86);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover td {
+    background: rgba(255, 255, 255, 0.025);
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.selected td {
+  background: rgba(212, 175, 55, 0.06);
+}
+
+.checkCol {
+  width: 2.75rem;
+  padding-inline: 0.85rem !important;
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #d4af37;
+  cursor: pointer;
+}
+
+.state {
+  display: grid;
+  gap: 0.65rem;
+  place-items: center;
+  padding: 3.5rem 1.5rem;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.emptyTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.emptyHint {
+  margin: 0;
+  max-width: 28rem;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.skeleton {
+  width: min(100%, 28rem);
+  height: 0.65rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.04)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}

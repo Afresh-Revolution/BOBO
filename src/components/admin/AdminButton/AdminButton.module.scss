@@ -1,0 +1,106 @@
+@use "../../../styles/mixins" as *;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-soft),
+    border-color var(--duration-fast) var(--ease-soft),
+    color var(--duration-fast) var(--ease-soft),
+    opacity var(--duration-fast) var(--ease-soft);
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.sm {
+  height: 2rem;
+  padding-inline: 0.75rem;
+  font-size: var(--text-xs);
+}
+
+.md {
+  height: 2.5rem;
+  padding-inline: 1rem;
+  font-size: var(--text-sm);
+}
+
+.primary {
+  background: var(--bobo-purple);
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: var(--bobo-purple-rich);
+  }
+}
+
+.secondary {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.88);
+
+  &:hover:not(:disabled) {
+    border-color: rgba(212, 175, 55, 0.5);
+    color: var(--bobo-gold-bright);
+  }
+}
+
+.ghost {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+  }
+}
+
+.danger {
+  background: rgba(180, 40, 40, 0.18);
+  border-color: rgba(220, 80, 80, 0.35);
+  color: #ffb4b4;
+
+  &:hover:not(:disabled) {
+    background: rgba(180, 40, 40, 0.28);
+  }
+}
+
+.gold {
+  background: var(--bobo-gold);
+  color: #111;
+
+  &:hover:not(:disabled) {
+    background: var(--bobo-gold-bright);
+  }
+}
+
+.spinner {
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+

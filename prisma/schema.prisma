@@ -1,0 +1,300 @@
+// BOBO Prisma schema — mirrors sql/schema.sql
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum ApplicationStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  REGISTERED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum MagicLinkType {
+  ACCEPTANCE
+  REGISTRATION_REMINDER
+  PASSWORD_RESET
+}
+
+enum MediaKind {
+  BIRTH_CERTIFICATE
+  ENTRY_VIDEO
+  GALLERY
+  SPONSOR
+  HERO
+  CBC_RECEIPT
+  OTHER
+}
+
+enum EmailTemplate {
+  APPLICATION_RECEIVED
+  APPLICATION_APPROVED
+  APPLICATION_REJECTED
+  REGISTRATION_REMINDER
+  LINK_EXPIRED
+  PAYMENT_CONFIRMATION
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  fullName  String
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applications Application[]
+
+  @@map("users")
+}
+
+model Admin {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  fullName     String
+  role         AdminRole @default(ADMIN)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  reviewedApplications Application[]     @relation("ReviewedBy")
+  uploadedMedia        Media[]
+  contentUpdates       WebsiteContent[]
+  settingsUpdates      Setting[]
+  auditLogs            AuditLog[]
+
+  @@map("admins")
+}
+
+model Application {
+  id                     String            @id @default(cuid())
+  userId                 String
+  fullName               String
+  email                  String
+  phone                  String
+  age                    Int
+  motherMaidenName       String
+  nin                    String
+  bloodGroup             String
+  genotype               String
+  historyOfAilments      String?
+  currentHealthChallenge String?
+  eligibilityAck         Boolean           @default(false)
+  status                 ApplicationStatus @default(PENDING)
+  reviewedById           String?
+  reviewedAt             DateTime?
+  rejectionReason        String?
+  notes                  String?
+  registeredAt           DateTime?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy Admin?        @relation("ReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  media      Media[]
+  video      Video?
+  payments   Payment[]
+  magicLinks MagicLink[]
+  emailLogs  EmailLog[]
+
+  @@index([status])
+  @@index([email])
+  @@index([createdAt(sort: Desc)])
+  @@map("applications")
+}
+
+model Media {
+  id            String    @id @default(cuid())
+  kind          MediaKind
+  cloudinaryId  String
+  url           String
+  secureUrl     String
+  format        String?
+  bytes         Int?
+  durationSec   Float?
+  width         Int?
+  height        Int?
+  originalName  String?
+  mimeType      String?
+  uploadedById  String?
+  applicationId String?
+  meta          Json      @default("{}")
+  createdAt     DateTime  @default(now())
+
+  uploadedBy  Admin?       @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  video       Video?
+
+  @@map("media")
+}
+
+model Video {
+  id            String   @id @default(cuid())
+  applicationId String   @unique
+  mediaId       String   @unique
+  promptChoice  String
+  durationSec   Float?
+  createdAt     DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  media       Media       @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@map("videos")
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  applicationId   String
+  amountCbc       Decimal       @default(3) @db.Decimal(12, 4)
+  amountNgnApprox Int           @default(75000)
+  status          PaymentStatus @default(PENDING)
+  reference       String?       @unique
+  provider        String        @default("CBC")
+  paidAt          DateTime?
+  meta            Json          @default("{}")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model MagicLink {
+  id            String        @id @default(cuid())
+  applicationId String
+  tokenHash     String        @unique
+  type          MagicLinkType
+  expiresAt     DateTime
+  usedAt        DateTime?
+  revokedAt     DateTime?
+  createdAt     DateTime      @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([tokenHash])
+  @@map("magic_links")
+}
+
+model WebsiteContent {
+  id          String   @id @default(cuid())
+  sectionKey  String   @unique
+  title       String?
+  subtitle    String?
+  body        String?
+  ctaLabel    String?
+  ctaHref     String?
+  imageUrl    String?
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(true)
+  meta        Json     @default("{}")
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  updatedBy Admin? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@map("website_content")
+}
+
+model EmailLog {
+  id            String        @id @default(cuid())
+  applicationId String?
+  toEmail       String
+  template      EmailTemplate
+  subject       String
+  status        String        @default("SENT")
+  providerId    String?
+  error         String?
+  meta          Json          @default("{}")
+  createdAt     DateTime      @default(now())
+
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+
+  @@map("email_logs")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  adminId   String?
+  action    String
+  entity    String
+  entityId  String?
+  ip        String?
+  userAgent String?
+  meta      Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  admin Admin? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
+
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json     @default("{}")
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+
+  updatedBy Admin? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@map("settings")
+}
+
+/// Hero right-rail slideshow — editable from Admin CMS
+model SeasonWinner {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  seasonNumber  Int       @unique @map("season_number")
+  seasonLabel   String    @map("season_label")
+  winnerName    String    @map("winner_name")
+  stateOfOrigin String    @map("state_of_origin")
+  imageUrl      String    @map("image_url")
+  imageMediaId  String?   @map("image_media_id")
+  sortOrder     Int       @default(0) @map("sort_order")
+  isPublished   Boolean   @default(true) @map("is_published")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("season_winners")
+}
+
+/// Landing "CBrilliance network" partner cards — editable from Admin CMS
+model NetworkPartner {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  href        String?
+  logoUrl     String?   @map("logo_url")
+  sortOrder   Int       @default(0) @map("sort_order")
+  isPublished Boolean   @default(true) @map("is_published")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  @@index([sortOrder, createdAt])
+  @@map("network_partners")
+}

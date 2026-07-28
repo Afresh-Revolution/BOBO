@@ -1,0 +1,37 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.good {
+  color: #c8f0c8;
+  background: rgba(40, 120, 60, 0.2);
+  border-color: rgba(80, 180, 100, 0.28);
+}
+
+.bad {
+  color: #ffc0c0;
+  background: rgba(140, 40, 40, 0.22);
+  border-color: rgba(200, 80, 80, 0.3);
+}
+
+.warn {
+  color: #f5e6a8;
+  background: rgba(212, 175, 55, 0.14);
+  border-color: rgba(212, 175, 55, 0.28);
+}
+
+.neutral {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}

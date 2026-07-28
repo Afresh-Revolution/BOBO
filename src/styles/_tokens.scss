@@ -1,0 +1,77 @@
+// BOBO Design Tokens — Battle Of Baddies On
+// Two primaries only. Everything else is tonal.
+
+:root {
+  /* Brand */
+  --bobo-purple: #4a148c;
+  --bobo-purple-deep: #2d0a56;
+  --bobo-purple-rich: #6a1fb0;
+  --bobo-purple-soft: rgba(74, 20, 140, 0.08);
+  --bobo-purple-mid: rgba(74, 20, 140, 0.16);
+
+  --bobo-gold: #d4af37;
+  --bobo-gold-bright: #e8c84a;
+  --bobo-gold-muted: #b8962e;
+  --bobo-gold-soft: rgba(212, 175, 55, 0.14);
+
+  /* Surfaces */
+  --bobo-smoke: #f5f5f5;
+  --bobo-white: #ffffff;
+  --bobo-ink: #111111;
+  --bobo-ink-soft: #2a2a2a;
+  --bobo-muted: #5c5c5c;
+  --bobo-line: rgba(17, 17, 17, 0.1);
+  --bobo-line-light: rgba(255, 255, 255, 0.12);
+
+  /* Glass */
+  --bobo-glass: rgba(255, 255, 255, 0.06);
+  --bobo-glass-border: rgba(255, 255, 255, 0.14);
+
+  /* Type */
+  --font-display: "Clash Display", "Segoe UI", sans-serif;
+  --font-body: "Satoshi", "Segoe UI", sans-serif;
+  --font-ui: "General Sans", "Segoe UI", sans-serif;
+
+  /* Scale */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.8125rem);
+  --text-sm: clamp(0.875rem, 0.82rem + 0.25vw, 0.9375rem);
+  --text-base: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+  --text-md: clamp(1.125rem, 1rem + 0.5vw, 1.25rem);
+  --text-lg: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem);
+  --text-xl: clamp(1.75rem, 1.3rem + 1.8vw, 2.75rem);
+  --text-2xl: clamp(2.5rem, 1.6rem + 3.2vw, 4.5rem);
+  --text-hero: clamp(3.25rem, 2rem + 6vw, 7.5rem);
+
+  /* Space */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+  --space-section: clamp(5rem, 4rem + 6vw, 9rem);
+
+  /* Layout */
+  --container: 72rem;
+  --container-wide: 88rem;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --header-h: 4.5rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 200ms;
+  --duration: 450ms;
+  --duration-slow: 800ms;
+
+  /* Shadows */
+  --shadow-soft: 0 18px 50px rgba(17, 17, 17, 0.08);
+  --shadow-lift: 0 24px 60px rgba(74, 20, 140, 0.18);
+}
