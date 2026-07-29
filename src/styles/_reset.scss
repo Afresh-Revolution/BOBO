@@ -7,11 +7,13 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: auto;
+  height: 100%;
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
+  min-height: 100%;
+  min-height: 100dvh;
   background: var(--bobo-smoke);
   color: var(--bobo-ink);
   font-family: var(--font-body);

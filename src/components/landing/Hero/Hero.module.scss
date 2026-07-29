@@ -1,13 +1,17 @@
 .hero {
   position: relative;
-  min-height: 100svh;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   align-items: end;
   overflow: clip;
   background: #0a0612;
   color: var(--bobo-white);
   padding-top: var(--header-h);
-  padding-bottom: clamp(3.5rem, 8vh, 5.5rem);
+  /* Keep CTAs clear of Safari’s bottom chrome (+10px lift on mobile) */
+  padding-bottom: calc(
+    clamp(3.5rem, 8vh, 5.5rem) + env(safe-area-inset-bottom, 0px) + 10px
+  );
 }
 
 .atmosphere {
@@ -204,6 +208,7 @@
 @media (min-width: 900px) {
   .hero {
     align-items: center;
+    padding-bottom: clamp(3.5rem, 8vh, 5.5rem);
   }
 
   .stage {
