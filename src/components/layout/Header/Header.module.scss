@@ -17,7 +17,17 @@
   border-bottom-color: var(--bobo-line-light);
 }
 
+/* Open menu: no backdrop-filter/filter — those trap position:fixed children
+   inside the short header box and hide the nav links. */
+.menuOpen {
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom-color: transparent;
+}
+
 .inner {
+  position: relative;
+  z-index: 2;
   height: 100%;
   display: flex;
   align-items: center;
@@ -28,7 +38,6 @@
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
-  z-index: 2;
 }
 
 .mark {
@@ -78,7 +87,6 @@
   display: grid;
   place-content: center;
   gap: 6px;
-  z-index: 2;
 }
 
 .bar {
@@ -100,6 +108,13 @@
 .mobile {
   position: fixed;
   inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background:
     radial-gradient(circle at 80% 10%, rgba(212, 175, 55, 0.12), transparent 40%),
     linear-gradient(160deg, #1a0a2e 0%, #0d0618 55%, #111 100%);

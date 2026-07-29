@@ -36,9 +36,12 @@ export function Header() {
 
   return (
     <header
-      className={[styles.header, scrolled || open ? styles.solid : ""].join(
-        " ",
-      )}
+      className={[
+        styles.header,
+        open ? styles.menuOpen : scrolled ? styles.solid : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
       <div className={`container ${styles.inner}`}>
         <Link href="/" className={styles.brand} aria-label="BOBO home">
