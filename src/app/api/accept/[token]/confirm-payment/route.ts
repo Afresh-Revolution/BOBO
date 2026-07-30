@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { hashToken } from "@/lib/auth";
 import { jsonError, jsonOk } from "@/lib/api";
+import { registrationFee } from "@/lib/content";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 
@@ -122,6 +123,8 @@ export async function POST(req: Request, ctx: RouteContext) {
         ? await tx.payment.update({
             where: { id: existing.id },
             data: {
+              amountCbc: registrationFee.amountCbc,
+              amountNgnApprox: registrationFee.amountNgnApprox,
               status: "PENDING",
               reference: existing.reference || reference,
               provider: "CBC",
@@ -132,8 +135,8 @@ export async function POST(req: Request, ctx: RouteContext) {
         : await tx.payment.create({
             data: {
               applicationId: app.id,
-              amountCbc: 3,
-              amountNgnApprox: 75000,
+              amountCbc: registrationFee.amountCbc,
+              amountNgnApprox: registrationFee.amountNgnApprox,
               status: "PENDING",
               reference,
               provider: "CBC",

@@ -20,6 +20,7 @@ export type Application = {
   age?: number;
   city?: string;
   state?: string;
+  stateOfResidence?: string;
   status: ApplicationStatus;
   createdAt: string;
   updatedAt?: string;
@@ -28,10 +29,12 @@ export type Application = {
   healthInfo?: string;
   reason?: string;
   nin?: string;
+  motherMaidenName?: string;
   tiktokUrl?: string;
   instagramUrl?: string;
   xUrl?: string;
   facebookUrl?: string;
+  promptChoice?: string;
 };
 
 export type DashboardStats = {
@@ -48,11 +51,18 @@ export type Payment = {
   applicationId?: string;
   contestantName: string;
   email: string;
+  phone?: string;
+  age?: number;
+  stateOfResidence?: string;
+  nin?: string;
   amount: number;
+  amountCbc?: number;
   currency?: string;
   status: "pending" | "success" | "failed" | "refunded";
   reference?: string;
   createdAt: string;
+  receiptUrl?: string;
+  submittedFullName?: string;
 };
 
 export type EmailLog = {

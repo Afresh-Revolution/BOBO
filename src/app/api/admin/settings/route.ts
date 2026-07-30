@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getAdminFromCookies } from "@/lib/auth";
 import { jsonError, jsonOk } from "@/lib/api";
+import { registrationFee } from "@/lib/content";
 
 const SETTING_DEFS: {
   key: string;
@@ -16,9 +17,15 @@ const SETTING_DEFS: {
   },
   {
     key: "registration_fee",
-    label: "Registration fee (NGN)",
+    label: "Registration fee (NGN approx)",
     type: "number",
-    defaultValue: 75000,
+    defaultValue: registrationFee.amountNgnApprox,
+  },
+  {
+    key: "registration_fee_cbc",
+    label: "Registration fee (CBC)",
+    type: "number",
+    defaultValue: registrationFee.amountCbc,
   },
   {
     key: "support_email",

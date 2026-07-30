@@ -204,6 +204,11 @@ export default function ApplicationsPage() {
         render: (row) => row.email,
       },
       {
+        key: "phone",
+        header: "Phone",
+        render: (row) => row.phone || "N/A",
+      },
+      {
         key: "status",
         header: "Status",
         render: (row) => <StatusBadge status={row.status} />,
@@ -351,8 +356,12 @@ export default function ApplicationsPage() {
               <div>
                 <dt>Location</dt>
                 <dd>
-                  {[selected.city, selected.state].filter(Boolean).join(", ") || "N/A"}
+                  {selected.stateOfResidence || selected.state || selected.city || "N/A"}
                 </dd>
+              </div>
+              <div>
+                <dt>Age</dt>
+                <dd>{selected.age ?? "N/A"}</dd>
               </div>
               <div>
                 <dt>Submitted</dt>

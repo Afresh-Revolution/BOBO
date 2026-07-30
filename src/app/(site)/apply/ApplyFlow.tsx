@@ -64,6 +64,7 @@ export function ApplyFlow() {
       email: "",
       phone: "",
       motherMaidenName: "",
+      stateOfResidence: "",
       nin: "",
       tiktokUrl: "",
       instagramUrl: "",
@@ -113,6 +114,7 @@ export function ApplyFlow() {
         email: values.email,
         phone: values.phone,
         age: values.age,
+        stateOfResidence: values.stateOfResidence,
         motherMaidenName: values.motherMaidenName,
         nin: values.nin,
         tiktokUrl: values.tiktokUrl,
@@ -375,6 +377,17 @@ export function ApplyFlow() {
                         max={38}
                         inputMode="numeric"
                         {...register("age", { valueAsNumber: true })}
+                      />
+                    </Field>
+                    <Field
+                      label="State of residence"
+                      error={errors.stateOfResidence?.message}
+                      htmlFor="stateOfResidence"
+                    >
+                      <input
+                        id="stateOfResidence"
+                        autoComplete="address-level1"
+                        {...register("stateOfResidence")}
                       />
                     </Field>
                     <Field

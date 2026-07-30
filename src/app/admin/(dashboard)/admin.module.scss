@@ -201,6 +201,17 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.receiptPreview {
+  display: block;
+  width: 100%;
+  max-height: 22rem;
+  object-fit: contain;
+  object-position: top center;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .videoActions {
   display: flex;
   flex-wrap: wrap;

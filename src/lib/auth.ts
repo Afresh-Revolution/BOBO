@@ -2,6 +2,7 @@ import { createHash, randomBytes, timingSafeEqual } from "crypto";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
+import { siteConfig } from "@/lib/content";
 import { prisma } from "@/lib/db";
 import type { Admin, AdminRole } from "@prisma/client";
 
@@ -90,10 +91,28 @@ export function safeEqual(a: string, b: string) {
   return timingSafeEqual(ba, bb);
 }
 
+function publicAppOrigin() {
+  const configured = (
+    process.env.APP_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    ""
+  )
+    .trim()
+    .replace(/\/$/, "");
+
+  // Emails / public links must never point at localhost — use the live site.
+  if (
+    configured &&
+    !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configured)
+  ) {
+    return configured;
+  }
+
+  return siteConfig.url.replace(/\/$/, "");
+}
+
+/** Absolute public URL (accept links, emails). Never returns localhost. */
 export function appUrl(path = "") {
-  const base = (process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(
-    /\/$/,
-    "",
-  );
+  const base = publicAppOrigin();
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }

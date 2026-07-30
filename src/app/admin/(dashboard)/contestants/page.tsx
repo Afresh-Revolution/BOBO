@@ -116,10 +116,17 @@ export default function ContestantsPage() {
         render: (row) => row.email,
       },
       {
+        key: "phone",
+        header: "Phone",
+        render: (row) => row.phone || "N/A",
+      },
+      {
         key: "location",
         header: "Location",
         render: (row) =>
-          [row.city, row.state].filter(Boolean).join(", ") || "N/A",
+          row.stateOfResidence ||
+          [row.city, row.state].filter(Boolean).join(", ") ||
+          "N/A",
       },
       {
         key: "status",

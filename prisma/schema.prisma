@@ -96,6 +96,7 @@ model Application {
   email                  String
   phone                  String
   age                    Int
+  stateOfResidence       String
   motherMaidenName       String
   nin                    String
   tiktokUrl              String?           @map("tiktok_url")
@@ -172,8 +173,8 @@ model Video {
 model Payment {
   id              String        @id @default(cuid())
   applicationId   String
-  amountCbc       Decimal       @default(3) @db.Decimal(12, 4)
-  amountNgnApprox Int           @default(75000)
+  amountCbc       Decimal       @default(5) @db.Decimal(12, 4)
+  amountNgnApprox Int           @default(150000)
   status          PaymentStatus @default(PENDING)
   reference       String?       @unique
   provider        String        @default("CBC")

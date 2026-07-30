@@ -155,6 +155,11 @@ const applicationFieldsSchema = z.object({
     .int("Age must be a whole number.")
     .min(18, "You must be at least 18.")
     .max(38, "You must be 38 or under."),
+  stateOfResidence: z
+    .string()
+    .trim()
+    .min(2, "Enter your state of residence.")
+    .max(80, "State name is too long."),
   motherMaidenName: z
     .string()
     .trim()

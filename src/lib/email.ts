@@ -14,6 +14,7 @@ import {
   strong,
   toPlainText,
 } from "@/lib/email-templates";
+import { registrationFeeDisplay } from "@/lib/content";
 
 type SendArgs = {
   to: string;
@@ -207,7 +208,7 @@ export async function emailApplicationApproved(
       paragraph(paragraphs[1]),
       highlightCard(
         bulletList([
-          `${strong("Fee:")} 5 CBC (approx. ₦150,000)`,
+          `${strong("Fee:")} ${registrationFeeDisplay()}`,
           `${strong("Expires:")} 48 hours from this email`,
           `${strong("Access:")} Single-use private link`,
         ]),
@@ -289,12 +290,13 @@ export async function emailPaymentConfirmation(
   const title = "You're registered";
   const home = appUrl("/");
   const paragraphs = [
-    "Your registration payment has been recorded. Welcome to BOBO.",
-    "Keep an eye on your email for contestant guidelines and next steps.",
+    "Your CBC registration payment has been confirmed. Welcome to BOBO.",
+    "Our team will communicate with you personally to share other relevant information and next steps for the show.",
+    "Please keep an eye on this inbox — and check spam/junk just in case.",
   ];
 
   const html = renderEmailLayout({
-    preheader: "Welcome to BOBO. Your registration is confirmed.",
+    preheader: "Your BOBO registration is confirmed. We'll be in touch personally.",
     title,
     bodyHtml: [
       paragraph(`Hi ${safeName},`),
@@ -303,6 +305,7 @@ export async function emailPaymentConfirmation(
         `${strong("Status: Registered")}<br/>You're among the contestants moving forward this season.`,
       ),
       paragraph(paragraphs[1]),
+      paragraph(paragraphs[2]),
     ].join(""),
     cta: { label: "Visit BOBO", href: home },
   });

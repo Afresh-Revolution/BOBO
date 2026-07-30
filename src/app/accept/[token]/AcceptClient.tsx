@@ -5,7 +5,11 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { siteConfig } from "@/lib/content";
+import {
+  registrationFee,
+  registrationFeeBuyInstruction,
+  siteConfig,
+} from "@/lib/content";
 import { uploadToCloudinary } from "@/lib/upload-client";
 import styles from "./accept.module.scss";
 
@@ -34,7 +38,7 @@ type AcceptPayload = {
 const DEFAULT_GUIDELINES = [
   "Keep your registration link private. It is single-use and expires in 48 hours.",
   "Do not share this page. Anyone with the link could submit in your place before you do.",
-  "Buy 5 CBC (approx. ₦150,000) on CBC Nets, then upload a screenshot of your purchase receipt.",
+  registrationFeeBuyInstruction(),
   "Stay reachable on the email used for your application.",
   "Follow all show conduct rules shared by the BOBO production team.",
 ];
@@ -365,8 +369,8 @@ export function AcceptClient() {
           <div className={styles.payHead}>
             <h2>Registration form</h2>
             <p>
-              Fee · <strong>{siteConfig.show.registrationFee}</strong>{" "}
-              <span>(approx. {siteConfig.show.registrationApprox})</span>
+              Fee · <strong>{registrationFee.label}</strong>{" "}
+              <span>(approx. {registrationFee.approxLabel})</span>
             </p>
           </div>
           <p className={styles.payCopy}>

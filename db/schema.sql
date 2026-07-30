@@ -73,6 +73,7 @@ CREATE TABLE applications (
   email                   TEXT NOT NULL,
   phone                   TEXT NOT NULL,
   age                     INT NOT NULL CHECK (age BETWEEN 18 AND 38),
+  state_of_residence      TEXT NOT NULL,
   mother_maiden_name      TEXT NOT NULL,
   nin                     TEXT NOT NULL,
   tiktok_url              TEXT,
@@ -129,8 +130,8 @@ CREATE TABLE videos (
 CREATE TABLE payments (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   application_id  UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
-  amount_cbc      NUMERIC(12, 4) NOT NULL DEFAULT 3,
-  amount_ngn_approx INT NOT NULL DEFAULT 75000,
+  amount_cbc      NUMERIC(12, 4) NOT NULL DEFAULT 5,
+  amount_ngn_approx INT NOT NULL DEFAULT 150000,
   status          payment_status NOT NULL DEFAULT 'PENDING',
   reference       TEXT UNIQUE,
   provider        TEXT NOT NULL DEFAULT 'CBC',

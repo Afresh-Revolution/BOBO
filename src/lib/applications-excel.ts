@@ -39,6 +39,7 @@ export async function buildApplicationsWorkbook(apps: AppWithMedia[]) {
     { header: "Email", key: "email", width: 30 },
     { header: "Phone", key: "phone", width: 16 },
     { header: "Age", key: "age", width: 8 },
+    { header: "State of residence", key: "stateOfResidence", width: 18 },
     { header: "Status", key: "status", width: 12 },
     { header: "TikTok", key: "tiktok", width: 18 },
     { header: "Instagram", key: "instagram", width: 18 },
@@ -58,6 +59,7 @@ export async function buildApplicationsWorkbook(apps: AppWithMedia[]) {
       email: app.email,
       phone: app.phone,
       age: app.age,
+      stateOfResidence: app.stateOfResidence,
       status: mapAppStatus(app.status as ApplicationStatus),
       submitted: app.createdAt.toISOString(),
     });

@@ -23,7 +23,16 @@ export async function GET(req: Request) {
     const payments = await prisma.payment.findMany({
       where,
       include: {
-        application: { select: { fullName: true, email: true } },
+        application: {
+          select: {
+            fullName: true,
+            email: true,
+            phone: true,
+            age: true,
+            stateOfResidence: true,
+            nin: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
       take: 500,

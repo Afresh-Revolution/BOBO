@@ -20,8 +20,6 @@ export const siteConfig = {
     portalOpens: "August 1",
     portalCloses: "October 31",
     showBegins: "December 26",
-    registrationFee: "5 CBC",
-    registrationApprox: "₦150,000",
   },
   pillars: [
     "Intelligent",
@@ -103,6 +101,31 @@ export const judging = [
   },
 ] as const;
 
+export const sponsors = [
+  { name: "CBrilliance", href: "https://cbrilliance.io" },
+  { name: "Popin", href: "https://popin.club" },
+  { name: "CBC Nets", href: "https://cbcnets.com" },
+] as const;
+
+/**
+ * Registration fee — change these values to update emails, accept flow,
+ * payment records, FAQ, and display copy site-wide.
+ */
+export const registrationFee = {
+  amountCbc: 5,
+  amountNgnApprox: 150_000,
+  label: "5 CBC",
+  approxLabel: "₦150,000",
+} as const;
+
+export function registrationFeeDisplay() {
+  return `${registrationFee.label} (approx. ${registrationFee.approxLabel})`;
+}
+
+export function registrationFeeBuyInstruction(where = "CBC Nets") {
+  return `Buy ${registrationFeeDisplay()} on ${where}, then upload a screenshot of your purchase receipt.`;
+}
+
 export const faqs = [
   {
     q: "Who can apply?",
@@ -114,7 +137,7 @@ export const faqs = [
   },
   {
     q: "Is there a registration fee?",
-    a: "Only approved applicants can register. The fee is 5 CBC (approx. ₦150,000). Payment is an investment into the CBC exchange ecosystem via cbcnets.com.",
+    a: `Only approved applicants can register. The fee is ${registrationFeeDisplay()}. Payment is an investment into the CBC exchange ecosystem via cbcnets.com.`,
   },
   {
     q: "Where does voting happen?",
@@ -128,10 +151,4 @@ export const faqs = [
     q: "What happens after I apply?",
     a: "You'll receive a confirmation. If approved, a secure single-use email link arrives (valid for 48 hours) to complete registration.",
   },
-] as const;
-
-export const sponsors = [
-  { name: "CBrilliance", href: "https://cbrilliance.io" },
-  { name: "Popin", href: "https://popin.club" },
-  { name: "CBC Nets", href: "https://cbcnets.com" },
 ] as const;

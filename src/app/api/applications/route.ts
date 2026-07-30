@@ -50,6 +50,7 @@ export async function POST(req: Request) {
           email,
           phone: data.phone.trim(),
           age: data.age,
+          stateOfResidence: data.stateOfResidence.trim(),
           motherMaidenName: data.motherMaidenName.trim(),
           nin: data.nin.trim(),
           tiktokUrl: emptySocialLinkToNull(data.tiktokUrl),
