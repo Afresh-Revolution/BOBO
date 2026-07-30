@@ -57,6 +57,10 @@ export function serializeApplication(
     genotype: app.genotype,
     nin: app.nin,
     motherMaidenName: app.motherMaidenName,
+    tiktokUrl: app.tiktokUrl ?? undefined,
+    instagramUrl: app.instagramUrl ?? undefined,
+    xUrl: app.xUrl ?? undefined,
+    facebookUrl: app.facebookUrl ?? undefined,
     promptChoice: app.video?.promptChoice,
   };
 }

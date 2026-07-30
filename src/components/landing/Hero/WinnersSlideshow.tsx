@@ -72,7 +72,6 @@ export function WinnersSlideshow({
                 className={styles.image}
                 priority
               />
-              <div className={styles.portraitGlow} aria-hidden />
             </div>
 
             <div className={styles.meta}>

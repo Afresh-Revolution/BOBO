@@ -80,6 +80,39 @@ export type EligibilityInput = z.infer<typeof eligibilitySchema>;
 const phoneRegex = /^(\+?234|0)[789][01]\d{8}$/;
 const ninRegex = /^\d{11}$/;
 
+/** Empty string or a valid http(s) URL. */
+const socialLinkField = z
+  .string()
+  .trim()
+  .refine(
+    (v) => v === "" || /^https?:\/\//i.test(v),
+    "Enter a full URL starting with http:// or https://.",
+  )
+  .refine(
+    (v) => {
+      if (v === "") return true;
+      try {
+        // eslint-disable-next-line no-new
+        new URL(v);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    "Enter a valid social media URL.",
+  );
+
+function countFilledSocialLinks(data: {
+  tiktokUrl?: string;
+  instagramUrl?: string;
+  xUrl?: string;
+  facebookUrl?: string;
+}) {
+  return [data.tiktokUrl, data.instagramUrl, data.xUrl, data.facebookUrl].filter(
+    (v) => typeof v === "string" && v.trim().length > 0,
+  ).length;
+}
+
 function isAllowedVideo(file: File) {
   const name = file.name.toLowerCase();
   const byExt = VIDEO_EXTENSIONS.some((ext) => name.endsWith(ext));
@@ -105,8 +138,8 @@ function isAllowedCertificate(file: File) {
   return byExt && byMime;
 }
 
-/** Client-side form schema (includes File objects before upload). */
-export const applicationFormSchema = z.object({
+/** Shared applicant fields (before media upload / after upload). */
+const applicationFieldsSchema = z.object({
   fullName: z
     .string()
     .trim()
@@ -128,6 +161,10 @@ export const applicationFormSchema = z.object({
     .min(2, "Enter your mother's maiden name.")
     .max(80, "Name is too long."),
   nin: z.string().trim().regex(ninRegex, "NIN must be exactly 11 digits."),
+  tiktokUrl: socialLinkField,
+  instagramUrl: socialLinkField,
+  xUrl: socialLinkField,
+  facebookUrl: socialLinkField,
   bloodGroup: z.enum(BLOOD_GROUPS, {
     error: "Select your blood group.",
   }),
@@ -147,21 +184,45 @@ export const applicationFormSchema = z.object({
   promptChoice: z.enum(PROMPT_CHOICES, {
     error: "Select one prompt question to answer in your video.",
   }),
-  birthCertificate: z
-    .custom<File>((v) => v instanceof File, {
-      message: "Upload your birth certificate.",
-    })
-    .refine((f) => f.size > 0, "Upload your birth certificate.")
-    .refine((f) => f.size <= CERT_MAX_BYTES, "Birth certificate must be 10MB or less.")
-    .refine(isAllowedCertificate, "Use JPG, PNG, WEBP, or PDF."),
-  entryVideo: z
-    .custom<File>((v) => v instanceof File, {
-      message: "Upload your entry video.",
-    })
-    .refine((f) => f.size > 0, "Upload your entry video.")
-    .refine((f) => f.size <= VIDEO_MAX_BYTES, "Video must be 100MB or less.")
-    .refine(isAllowedVideo, "Video must be MP4, MOV, or AVI."),
 });
+
+function requireTwoSocialLinks(
+  data: {
+    tiktokUrl?: string;
+    instagramUrl?: string;
+    xUrl?: string;
+    facebookUrl?: string;
+  },
+  ctx: z.RefinementCtx,
+) {
+  if (countFilledSocialLinks(data) < 2) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["tiktokUrl"],
+      message: "Provide at least two social media links.",
+    });
+  }
+}
+
+/** Client-side form schema (includes File objects before upload). */
+export const applicationFormSchema = applicationFieldsSchema
+  .extend({
+    birthCertificate: z
+      .custom<File>((v) => v instanceof File, {
+        message: "Upload your birth certificate.",
+      })
+      .refine((f) => f.size > 0, "Upload your birth certificate.")
+      .refine((f) => f.size <= CERT_MAX_BYTES, "Birth certificate must be 10MB or less.")
+      .refine(isAllowedCertificate, "Use JPG, PNG, WEBP, or PDF."),
+    entryVideo: z
+      .custom<File>((v) => v instanceof File, {
+        message: "Upload your entry video.",
+      })
+      .refine((f) => f.size > 0, "Upload your entry video.")
+      .refine((f) => f.size <= VIDEO_MAX_BYTES, "Video must be 100MB or less.")
+      .refine(isAllowedVideo, "Video must be MP4, MOV, or AVI."),
+  })
+  .superRefine(requireTwoSocialLinks);
 
 export type ApplicationFormInput = z.infer<typeof applicationFormSchema>;
 
@@ -177,15 +238,20 @@ export const mediaAssetSchema = z.object({
 export type MediaAsset = z.infer<typeof mediaAssetSchema>;
 
 /** Payload sent to POST /api/applications after Cloudinary upload. */
-export const applicationSubmitSchema = applicationFormSchema
-  .omit({ birthCertificate: true, entryVideo: true })
+export const applicationSubmitSchema = applicationFieldsSchema
   .extend({
     birthCertificate: mediaAssetSchema,
     entryVideo: mediaAssetSchema,
-  });
+  })
+  .superRefine(requireTwoSocialLinks);
 
 export type ApplicationSubmitInput = z.infer<typeof applicationSubmitSchema>;
 
+export function emptySocialLinkToNull(value: string | undefined | null) {
+  if (!value) return null;
+  const trimmed = value.trim();
+  return trimmed.length ? trimmed : null;
+}
 export const ELIGIBILITY_ITEMS: {
   key: EligibilityKey;
   label: string;

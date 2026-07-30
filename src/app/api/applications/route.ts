@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/db";
 import { jsonError, jsonOk, rateLimit, clientIp } from "@/lib/api";
 import { emailApplicationReceived } from "@/lib/email";
-import { applicationSubmitSchema } from "@/lib/validations/application";
+import {
+  applicationSubmitSchema,
+  emptySocialLinkToNull,
+} from "@/lib/validations/application";
 
 export async function POST(req: Request) {
   try {
@@ -49,6 +52,10 @@ export async function POST(req: Request) {
           age: data.age,
           motherMaidenName: data.motherMaidenName.trim(),
           nin: data.nin.trim(),
+          tiktokUrl: emptySocialLinkToNull(data.tiktokUrl),
+          instagramUrl: emptySocialLinkToNull(data.instagramUrl),
+          xUrl: emptySocialLinkToNull(data.xUrl),
+          facebookUrl: emptySocialLinkToNull(data.facebookUrl),
           bloodGroup: data.bloodGroup,
           genotype: data.genotype,
           historyOfAilments: data.historyOfAilments.trim(),

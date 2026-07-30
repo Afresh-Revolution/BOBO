@@ -10,6 +10,8 @@ export const siteConfig = {
     cbrilliance: "https://cbrilliance.io",
     popin: "https://popin.club",
     cbc: "https://cbcnets.com",
+    tiktok: "https://www.tiktok.com/@popin_club",
+    instagram: "https://www.instagram.com/popin_club",
   },
   show: {
     contestants: 15,
@@ -18,8 +20,8 @@ export const siteConfig = {
     portalOpens: "August 1",
     portalCloses: "October 31",
     showBegins: "December 26",
-    registrationFee: "3 CBC",
-    registrationApprox: "₦82,000",
+    registrationFee: "5 CBC",
+    registrationApprox: "₦150,000",
   },
   pillars: [
     "Intelligent",
@@ -112,7 +114,7 @@ export const faqs = [
   },
   {
     q: "Is there a registration fee?",
-    a: "Only approved applicants can register. The fee is 3 CBC (approx. ₦82,000). Payment is an investment into the CBC exchange ecosystem via cbcnets.com.",
+    a: "Only approved applicants can register. The fee is 5 CBC (approx. ₦150,000). Payment is an investment into the CBC exchange ecosystem via cbcnets.com.",
   },
   {
     q: "Where does voting happen?",

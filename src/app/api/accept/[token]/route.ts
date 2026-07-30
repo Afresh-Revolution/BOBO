@@ -7,7 +7,7 @@ import { mapAppStatus } from "@/lib/serializers";
 const DEFAULT_GUIDELINES = [
   "Keep your registration link private. It is single-use and expires in 48 hours.",
   "Do not share this page. Anyone with the link could submit in your place before you do.",
-  "Buy 3 CBC (approx. ₦82,000) on CBC Nets, then upload a screenshot of your purchase receipt.",
+  "Buy 5 CBC (approx. ₦150,000) on CBC Nets, then upload a screenshot of your purchase receipt.",
   "Stay reachable on the email used for your application.",
   "Follow all show conduct rules shared by the BOBO production team.",
 ];

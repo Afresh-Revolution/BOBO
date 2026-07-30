@@ -389,7 +389,7 @@ Only accepted contestants can pay.
 
 Fee
 
-3 CBC
+5 CBC
 
 Display
 

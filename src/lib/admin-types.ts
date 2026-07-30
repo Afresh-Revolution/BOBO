@@ -27,6 +27,11 @@ export type Application = {
   birthCertUrl?: string;
   healthInfo?: string;
   reason?: string;
+  nin?: string;
+  tiktokUrl?: string;
+  instagramUrl?: string;
+  xUrl?: string;
+  facebookUrl?: string;
 };
 
 export type DashboardStats = {

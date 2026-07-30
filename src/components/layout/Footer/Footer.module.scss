@@ -32,8 +32,28 @@
 .tagline {
   color: rgba(255, 255, 255, 0.58);
   max-width: 22rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   line-height: 1.6;
+}
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.72);
+  transition: color var(--duration-fast) ease;
+}
+
+.social:hover,
+.social:focus-visible {
+  color: var(--bobo-gold);
 }
 
 .cols {

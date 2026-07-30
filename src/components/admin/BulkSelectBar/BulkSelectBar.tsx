@@ -11,7 +11,9 @@ type BulkSelectBarProps = {
   onSelectFirst: (count: number) => void;
   onClear: () => void;
   onDelete: () => void | Promise<void>;
+  onExport?: () => void | Promise<void>;
   deleting?: boolean;
+  exporting?: boolean;
   entityLabel?: string;
 };
 
@@ -22,7 +24,9 @@ export function BulkSelectBar({
   onSelectFirst,
   onClear,
   onDelete,
+  onExport,
   deleting,
+  exporting,
   entityLabel = "items",
 }: BulkSelectBarProps) {
   const [countInput, setCountInput] = useState("");
@@ -72,6 +76,18 @@ export function BulkSelectBar({
         {selectedCount > 0 ? (
           <AdminButton size="sm" variant="ghost" onClick={onClear}>
             Clear
+          </AdminButton>
+        ) : null}
+
+        {onExport ? (
+          <AdminButton
+            size="sm"
+            variant="gold"
+            disabled={selectedCount === 0}
+            loading={exporting}
+            onClick={() => void onExport()}
+          >
+            Export Excel
           </AdminButton>
         ) : null}
 

@@ -65,6 +65,10 @@ export function ApplyFlow() {
       phone: "",
       motherMaidenName: "",
       nin: "",
+      tiktokUrl: "",
+      instagramUrl: "",
+      xUrl: "",
+      facebookUrl: "",
       historyOfAilments: "",
       currentHealthChallenge: "",
     },
@@ -111,6 +115,10 @@ export function ApplyFlow() {
         age: values.age,
         motherMaidenName: values.motherMaidenName,
         nin: values.nin,
+        tiktokUrl: values.tiktokUrl,
+        instagramUrl: values.instagramUrl,
+        xUrl: values.xUrl,
+        facebookUrl: values.facebookUrl,
         bloodGroup: values.bloodGroup,
         genotype: values.genotype,
         historyOfAilments: values.historyOfAilments,
@@ -390,6 +398,68 @@ export function ApplyFlow() {
                         inputMode="numeric"
                         maxLength={11}
                         {...register("nin")}
+                      />
+                    </Field>
+                  </div>
+                </fieldset>
+
+                <fieldset className={styles.fieldset} disabled={busy}>
+                  <legend>Social media</legend>
+                  <p className={styles.hint}>
+                    Paste profile links. At least two are required.
+                  </p>
+                  <div className={styles.grid}>
+                    <Field
+                      label="TikTok"
+                      error={errors.tiktokUrl?.message}
+                      htmlFor="tiktokUrl"
+                      hint="Optional if you fill two others"
+                    >
+                      <input
+                        id="tiktokUrl"
+                        type="url"
+                        inputMode="url"
+                        placeholder="https://www.tiktok.com/@username"
+                        {...register("tiktokUrl")}
+                      />
+                    </Field>
+                    <Field
+                      label="Instagram"
+                      error={errors.instagramUrl?.message}
+                      htmlFor="instagramUrl"
+                    >
+                      <input
+                        id="instagramUrl"
+                        type="url"
+                        inputMode="url"
+                        placeholder="https://www.instagram.com/username"
+                        {...register("instagramUrl")}
+                      />
+                    </Field>
+                    <Field
+                      label="X"
+                      error={errors.xUrl?.message}
+                      htmlFor="xUrl"
+                    >
+                      <input
+                        id="xUrl"
+                        type="url"
+                        inputMode="url"
+                        placeholder="https://x.com/username"
+                        {...register("xUrl")}
+                      />
+                    </Field>
+                    <Field
+                      label="Facebook"
+                      error={errors.facebookUrl?.message}
+                      htmlFor="facebookUrl"
+                    >
+                      <input
+                        id="facebookUrl"
+                        type="url"
+                        inputMode="url"
+                        placeholder="https://www.facebook.com/username"
+                        {...register("facebookUrl")}
                       />
                     </Field>
                   </div>

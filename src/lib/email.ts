@@ -207,7 +207,7 @@ export async function emailApplicationApproved(
       paragraph(paragraphs[1]),
       highlightCard(
         bulletList([
-          `${strong("Fee:")} 3 CBC (approx. ₦82,000)`,
+          `${strong("Fee:")} 5 CBC (approx. ₦150,000)`,
           `${strong("Expires:")} 48 hours from this email`,
           `${strong("Access:")} Single-use private link`,
         ]),

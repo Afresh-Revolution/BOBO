@@ -98,6 +98,10 @@ model Application {
   age                    Int
   motherMaidenName       String
   nin                    String
+  tiktokUrl              String?           @map("tiktok_url")
+  instagramUrl           String?           @map("instagram_url")
+  xUrl                  String?           @map("x_url")
+  facebookUrl            String?           @map("facebook_url")
   bloodGroup             String
   genotype               String
   historyOfAilments      String?

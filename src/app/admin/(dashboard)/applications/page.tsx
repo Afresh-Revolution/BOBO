@@ -48,6 +48,7 @@ export default function ApplicationsPage() {
   const [selected, setSelected] = useState<Application | null>(null);
   const [actingId, setActingId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [reason, setReason] = useState("");
   const [tick, setTick] = useState(0);
 
@@ -148,6 +149,47 @@ export default function ApplicationsPage() {
     },
     [ask, selection],
   );
+
+  const exportSelected = useCallback(async () => {
+    const ids = selection.selectedIds;
+    if (!ids.length) {
+      setError("Select at least one submission to export.");
+      return;
+    }
+
+    setExporting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/applications/export", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids, format: "xlsx" }),
+      });
+
+      if (!res.ok) {
+        const json = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        throw new Error(json?.error || `Export failed (${res.status})`);
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = "bobo-applications.xlsx";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to export Excel");
+    } finally {
+      setExporting(false);
+    }
+  }, [selection.selectedIds]);
+
 
   const columns: Column<Application>[] = useMemo(
     () => [
@@ -258,7 +300,9 @@ export default function ApplicationsPage() {
           onSelectFirst={selection.selectFirst}
           onClear={selection.clear}
           onDelete={() => deleteIds(selection.selectedIds)}
+          onExport={exportSelected}
           deleting={deleting}
+          exporting={exporting}
           entityLabel="submissions"
         />
       ) : null}
@@ -313,6 +357,71 @@ export default function ApplicationsPage() {
               <div>
                 <dt>Submitted</dt>
                 <dd>{formatDate(selected.createdAt)}</dd>
+              </div>
+              <div>
+                <dt>NIN</dt>
+                <dd>{selected.nin || "N/A"}</dd>
+              </div>
+              <div>
+                <dt>Social links</dt>
+                <dd>
+                  <ul className={styles.socialList}>
+                    {selected.tiktokUrl ? (
+                      <li>
+                        <a
+                          className={styles.mediaLink}
+                          href={selected.tiktokUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          TikTok
+                        </a>
+                      </li>
+                    ) : null}
+                    {selected.instagramUrl ? (
+                      <li>
+                        <a
+                          className={styles.mediaLink}
+                          href={selected.instagramUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Instagram
+                        </a>
+                      </li>
+                    ) : null}
+                    {selected.xUrl ? (
+                      <li>
+                        <a
+                          className={styles.mediaLink}
+                          href={selected.xUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          X
+                        </a>
+                      </li>
+                    ) : null}
+                    {selected.facebookUrl ? (
+                      <li>
+                        <a
+                          className={styles.mediaLink}
+                          href={selected.facebookUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Facebook
+                        </a>
+                      </li>
+                    ) : null}
+                    {!selected.tiktokUrl &&
+                    !selected.instagramUrl &&
+                    !selected.xUrl &&
+                    !selected.facebookUrl
+                      ? "N/A"
+                      : null}
+                  </ul>
+                </dd>
               </div>
               <div>
                 <dt>Intro video</dt>
