@@ -7,7 +7,11 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { faqs } from "@/lib/content";
 import styles from "./FAQ.module.scss";
 
-export function FAQ() {
+type FAQProps = {
+  items?: { q: string; a: string }[];
+};
+
+export function FAQ({ items = faqs as unknown as { q: string; a: string }[] }: FAQProps) {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
@@ -22,7 +26,7 @@ export function FAQ() {
         </Reveal>
 
         <div className={styles.list} role="list">
-          {faqs.map((item, i) => {
+          {items.map((item, i) => {
             const isOpen = open === i;
             const panelId = `faq-panel-${i}`;
             const buttonId = `faq-button-${i}`;

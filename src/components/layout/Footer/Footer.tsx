@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import { ApplyCta } from "@/components/ui/ApplyCta";
 import { siteConfig } from "@/lib/content";
 import styles from "./Footer.module.scss";
 
@@ -39,7 +39,15 @@ const socialLinks = [
   },
 ] as const;
 
-export function Footer() {
+type FooterProps = {
+  applyLabel?: string;
+  applyHref?: string | null;
+};
+
+export function Footer({
+  applyLabel = "Apply Now",
+  applyHref = siteConfig.links.apply,
+}: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
@@ -71,9 +79,7 @@ export function Footer() {
               </a>
             ))}
           </div>
-          <Button href={siteConfig.links.apply} variant="gold" size="md">
-            Apply Now
-          </Button>
+          <ApplyCta label={applyLabel} href={applyHref} variant="gold" size="md" />
         </div>
 
         <div className={styles.cols}>
@@ -91,17 +97,29 @@ export function Footer() {
             <p className={styles.heading}>Ecosystem</p>
             <ul>
               <li>
-                <a href={siteConfig.links.cbrilliance} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={siteConfig.links.cbrilliance}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   CBrilliance
                 </a>
               </li>
               <li>
-                <a href={siteConfig.links.popin} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={siteConfig.links.popin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Popin Voting
                 </a>
               </li>
               <li>
-                <a href={siteConfig.links.cbc} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={siteConfig.links.cbc}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   CBC Nets
                 </a>
               </li>

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { jsonError, jsonOk, rateLimit, clientIp } from "@/lib/api";
 import { emailApplicationReceived } from "@/lib/email";
+import { getPortalSettings } from "@/lib/portal";
 import {
   applicationSubmitSchema,
   emptySocialLinkToNull,
@@ -8,6 +9,11 @@ import {
 
 export async function POST(req: Request) {
   try {
+    const portal = await getPortalSettings();
+    if (!portal.isAccepting) {
+      return jsonError(portal.statusMessage || "Applications are closed.", 403);
+    }
+
     const body = await req.json().catch(() => null);
     const parsed = applicationSubmitSchema.safeParse(body);
     if (!parsed.success) {

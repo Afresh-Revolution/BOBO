@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { getAdminFromCookies } from "@/lib/auth";
 import { jsonError, jsonOk, clientIp } from "@/lib/api";
 import { parseIdList } from "@/lib/admin-bulk";
+import { revalidatePublicSite } from "@/lib/revalidate-site";
 import type { Prisma } from "@prisma/client";
 
 export async function POST(req: Request) {
@@ -29,6 +30,7 @@ export async function POST(req: Request) {
       },
     });
 
+    revalidatePublicSite();
     return jsonOk({ data: { deleted: result.count, ids } });
   } catch (err) {
     console.error("[admin/partners/bulk-delete]", err);

@@ -21,6 +21,14 @@ import styles from "./apply.module.scss";
 
 type Step = "eligibility" | "form" | "success";
 
+export type ApplyPortalInfo = {
+  isAccepting: boolean;
+  openDateLabel: string;
+  closeDateLabel: string;
+  statusMessage: string;
+  ctaLabel: string;
+};
+
 const ease = [0.16, 1, 0.3, 1] as const;
 
 function formatBytes(bytes: number) {
@@ -28,7 +36,17 @@ function formatBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function ApplyFlow() {
+type ApplyFlowProps = {
+  portal?: ApplyPortalInfo;
+};
+
+export function ApplyFlow({ portal }: ApplyFlowProps) {
+  const isAccepting = portal?.isAccepting ?? true;
+  const openLabel = portal?.openDateLabel ?? siteConfig.show.portalOpens;
+  const closeLabel = portal?.closeDateLabel ?? siteConfig.show.portalCloses;
+  const statusMessage =
+    portal?.statusMessage ??
+    `Portal open ${openLabel} to ${closeLabel}. Confirm eligibility, then submit your details and entry video.`;
   const [step, setStep] = useState<Step>("eligibility");
   const [checks, setChecks] = useState<Record<string, boolean>>({
     cbrilliance: false,
@@ -174,14 +192,30 @@ export function ApplyFlow() {
         <header className={styles.intro}>
           <p className={styles.eyebrow}>Apply · BOBO</p>
           <h1>Claim your place among the Baddies.</h1>
-          <p className={styles.lede}>
-            Portal open {siteConfig.show.portalOpens} to{" "}
-            {siteConfig.show.portalCloses}. Confirm eligibility, then submit your
-            details and entry video.
-          </p>
+          <p className={styles.lede}>{statusMessage}</p>
         </header>
 
-        {step !== "success" ? (
+        {!isAccepting ? (
+          <div className={styles.panel}>
+            <h2>
+              {portal?.ctaLabel?.startsWith("Opens")
+                ? "Applications not open yet"
+                : "Applications closed"}
+            </h2>
+            <p>
+              {portal?.ctaLabel?.startsWith("Opens")
+                ? `Applications open on ${openLabel}. Please check back then.`
+                : `The application portal is closed. Window: ${openLabel} to ${closeLabel}.`}
+            </p>
+            <div className={styles.actions}>
+              <Button href="/" variant="secondary" size="md">
+                Back to home
+              </Button>
+            </div>
+          </div>
+        ) : null}
+
+        {isAccepting && step !== "success" ? (
           <ol className={styles.steps} aria-label="Application steps">
             <li
               className={[
@@ -203,6 +237,7 @@ export function ApplyFlow() {
           </ol>
         ) : null}
 
+        {isAccepting ? (
         <AnimatePresence mode="wait">
           {step === "eligibility" ? (
             <motion.section
@@ -734,6 +769,7 @@ export function ApplyFlow() {
             </motion.section>
           ) : null}
         </AnimatePresence>
+        ) : null}
       </div>
     </div>
   );

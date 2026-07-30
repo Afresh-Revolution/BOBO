@@ -2,11 +2,12 @@ import { prisma } from "@/lib/db";
 import { getAdminFromCookies } from "@/lib/auth";
 import { jsonError, jsonOk } from "@/lib/api";
 import { registrationFee } from "@/lib/content";
+import { revalidatePublicSite } from "@/lib/revalidate-site";
 
 const SETTING_DEFS: {
   key: string;
   label: string;
-  type: "text" | "boolean" | "number" | "textarea";
+  type: "text" | "boolean" | "number" | "textarea" | "date";
   defaultValue: string | boolean | number;
 }[] = [
   {
@@ -14,6 +15,18 @@ const SETTING_DEFS: {
     label: "Applications open",
     type: "boolean",
     defaultValue: false,
+  },
+  {
+    key: "applications_open_date",
+    label: "Applications open date",
+    type: "date",
+    defaultValue: "2026-08-01",
+  },
+  {
+    key: "applications_close_date",
+    label: "Applications close date",
+    type: "date",
+    defaultValue: "2026-10-31",
   },
   {
     key: "registration_fee",
@@ -43,7 +56,7 @@ const SETTING_DEFS: {
 
 function unwrapValue(
   raw: unknown,
-  type: "text" | "boolean" | "number" | "textarea",
+  type: "text" | "boolean" | "number" | "textarea" | "date",
   fallback: string | boolean | number,
 ): string | boolean | number {
   if (raw && typeof raw === "object" && !Array.isArray(raw) && "value" in raw) {
@@ -58,7 +71,19 @@ function unwrapValue(
     const n = typeof raw === "number" ? raw : Number(raw);
     return Number.isFinite(n) ? n : (fallback as number);
   }
-  return raw == null ? (fallback as string) : String(raw);
+  if (raw == null) return fallback as string;
+  if (typeof raw === "object") {
+    try {
+      return JSON.stringify(raw);
+    } catch {
+      return fallback as string;
+    }
+  }
+  const str = String(raw);
+  if (type === "date" && /^\d{4}-\d{2}-\d{2}/.test(str)) {
+    return str.slice(0, 10);
+  }
+  return str;
 }
 
 export async function GET() {
@@ -71,6 +96,7 @@ export async function GET() {
       rows.map((r: { key: string; value: unknown }) => [r.key, r]),
     );
 
+    // Only expose known settings — avoids leftover keys like "site" rendering as [object Object]
     const data = SETTING_DEFS.map((def) => {
       const row = byKey.get(def.key) as { value: unknown } | undefined;
       return {
@@ -82,16 +108,6 @@ export async function GET() {
           : def.defaultValue,
       };
     });
-
-    for (const row of rows as { key: string; value: unknown }[]) {
-      if (SETTING_DEFS.some((d) => d.key === row.key)) continue;
-      data.push({
-        key: row.key,
-        label: row.key,
-        type: "text" as const,
-        value: unwrapValue(row.value, "text", ""),
-      });
-    }
 
     return jsonOk({ data });
   } catch (err) {
@@ -118,9 +134,13 @@ export async function PUT(req: Request) {
       return jsonError("settings array is required.", 400);
     }
 
+    const allowed = new Set(SETTING_DEFS.map((d) => d.key));
+
     for (const setting of settings) {
-      if (!setting.key) continue;
-      const valuePayload = { value: setting.value } as import("@prisma/client").Prisma.InputJsonValue;
+      if (!setting.key || !allowed.has(setting.key)) continue;
+      const valuePayload = {
+        value: setting.value,
+      } as import("@prisma/client").Prisma.InputJsonValue;
       await prisma.setting.upsert({
         where: { key: setting.key },
         create: {
@@ -135,6 +155,7 @@ export async function PUT(req: Request) {
       });
     }
 
+    revalidatePublicSite();
     return jsonOk({ message: "Settings saved" });
   } catch (err) {
     console.error("[admin/settings PUT]", err);

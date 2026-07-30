@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getAdminFromCookies } from "@/lib/auth";
 import { jsonError, jsonOk } from "@/lib/api";
+import { revalidatePublicSite } from "@/lib/revalidate-site";
 import type { Prisma } from "@prisma/client";
 
 type CmsContent = Record<string, unknown>;
@@ -130,6 +131,7 @@ export async function PUT(req: Request) {
       results.push(serializeCms(saved));
     }
 
+    revalidatePublicSite();
     return jsonOk({ data: results });
   } catch (err) {
     console.error("[admin/cms PUT]", err);

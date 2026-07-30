@@ -95,7 +95,7 @@ export type SiteSetting = {
   key: string;
   label: string;
   value: string | boolean | number;
-  type?: "text" | "boolean" | "number" | "textarea";
+  type?: "text" | "boolean" | "number" | "textarea" | "date";
 };
 
 export type AnalyticsData = {

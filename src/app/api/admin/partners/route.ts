@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getAdminFromCookies } from "@/lib/auth";
 import { jsonError, jsonOk } from "@/lib/api";
+import { revalidatePublicSite } from "@/lib/revalidate-site";
 import { z } from "zod";
 
 const partnerSchema = z.object({
@@ -79,6 +80,7 @@ export async function POST(req: Request) {
       data: parsed.data,
     });
 
+    revalidatePublicSite();
     return jsonOk({ data: serialize(row) });
   } catch (err) {
     console.error("[admin/partners POST]", err);

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AdminButton, AdminShell } from "@/components/admin";
+import { FormSkeleton } from "@/components/ui/Skeleton";
 import { adminFetch, unwrapList } from "@/lib/admin-api";
 import type { SiteSetting } from "@/lib/admin-types";
 import { useAdminResource } from "@/lib/use-admin-resource";
@@ -15,9 +16,27 @@ const FALLBACK: SiteSetting[] = [
     type: "boolean",
   },
   {
+    key: "applications_open_date",
+    label: "Applications open date",
+    value: "2026-08-01",
+    type: "date",
+  },
+  {
+    key: "applications_close_date",
+    label: "Applications close date",
+    value: "2026-10-31",
+    type: "date",
+  },
+  {
     key: "registration_fee",
     label: "Registration fee (NGN)",
-    value: 0,
+    value: 150000,
+    type: "number",
+  },
+  {
+    key: "registration_fee_cbc",
+    label: "Registration fee (CBC)",
+    value: 5,
     type: "number",
   },
   {
@@ -67,7 +86,7 @@ export default function SettingsPage() {
         method: "PUT",
         body: { settings },
       });
-      setMessage("Settings saved");
+      setMessage("Settings saved — live site updated.");
     } catch (err) {
       setLocalError(err instanceof Error ? err.message : "Save failed");
     } finally {
@@ -84,7 +103,12 @@ export default function SettingsPage() {
           <AdminButton variant="secondary" size="sm" onClick={reload}>
             Reload
           </AdminButton>
-          <AdminButton variant="gold" size="sm" loading={saving} onClick={() => void save()}>
+          <AdminButton
+            variant="gold"
+            size="sm"
+            loading={saving}
+            onClick={() => void save()}
+          >
             Save changes
           </AdminButton>
         </div>
@@ -96,7 +120,9 @@ export default function SettingsPage() {
       {message ? <p className={styles.muted}>{message}</p> : null}
 
       {loading ? (
-        <p className={styles.muted}>Loading settings…</p>
+        <div className={styles.panel}>
+          <FormSkeleton fields={7} />
+        </div>
       ) : (
         <div className={styles.panel}>
           <div className={styles.fieldGrid}>
@@ -125,7 +151,13 @@ export default function SettingsPage() {
                   ) : (
                     <input
                       className={styles.input}
-                      type={type === "number" ? "number" : "text"}
+                      type={
+                        type === "number"
+                          ? "number"
+                          : type === "date"
+                            ? "date"
+                            : "text"
+                      }
                       value={String(setting.value ?? "")}
                       onChange={(e) =>
                         updateValue(

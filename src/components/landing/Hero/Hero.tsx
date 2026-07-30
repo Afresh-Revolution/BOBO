@@ -16,7 +16,7 @@ type HeroProps = {
   fullName?: string;
   tagline?: string;
   ctaLabel?: string;
-  ctaHref?: string;
+  ctaHref?: string | null;
 };
 
 export function Hero({
@@ -115,7 +115,12 @@ export function Hero({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.48, ease: [0.16, 1, 0.3, 1] }}
           >
-            <Button href={ctaHref} variant="gold" size="lg">
+            <Button
+              href={ctaHref || undefined}
+              variant="gold"
+              size="lg"
+              disabled={!ctaHref}
+            >
               {ctaLabel}
             </Button>
             <Button href="#about" variant="secondary" size="lg">

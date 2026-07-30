@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getAdminFromCookies } from "@/lib/auth";
 import { jsonError, jsonOk } from "@/lib/api";
+import { revalidatePublicSite } from "@/lib/revalidate-site";
 import type { Prisma } from "@prisma/client";
 
 type RouteContext = { params: Promise<{ sectionKey: string }> };
@@ -104,6 +105,7 @@ export async function PUT(req: Request, ctx: RouteContext) {
       },
     });
 
+    revalidatePublicSite();
     return jsonOk({ data: serializeCms(saved) });
   } catch (err) {
     console.error("[admin/cms/sectionKey]", err);

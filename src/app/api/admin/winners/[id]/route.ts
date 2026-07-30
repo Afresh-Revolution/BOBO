@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getAdminFromCookies } from "@/lib/auth";
 import { jsonError, jsonOk } from "@/lib/api";
+import { revalidatePublicSite } from "@/lib/revalidate-site";
 import { z } from "zod";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -77,6 +78,7 @@ export async function PATCH(req: Request, ctx: RouteContext) {
       data: parsed.data,
     });
 
+    revalidatePublicSite();
     return jsonOk({ data: serialize(row) });
   } catch (err) {
     console.error("[admin/winners PATCH]", err);
@@ -100,6 +102,7 @@ export async function DELETE(_req: Request, ctx: RouteContext) {
       data: { deletedAt: new Date(), isPublished: false },
     });
 
+    revalidatePublicSite();
     return jsonOk({ data: { id } });
   } catch (err) {
     console.error("[admin/winners DELETE]", err);

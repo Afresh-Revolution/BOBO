@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/Button";
+import { ApplyCta } from "@/components/ui/ApplyCta";
 import { siteConfig } from "@/lib/content";
 import styles from "./Header.module.scss";
 
@@ -16,7 +16,15 @@ const nav = [
   { href: "#faq", label: "FAQ" },
 ];
 
-export function Header() {
+type HeaderProps = {
+  applyLabel?: string;
+  applyHref?: string | null;
+};
+
+export function Header({
+  applyLabel = "Apply Now",
+  applyHref = siteConfig.links.apply,
+}: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -65,9 +73,12 @@ export function Header() {
         </nav>
 
         <div className={styles.actions}>
-          <Button href={siteConfig.links.apply} size="md" variant="gold">
-            Apply Now
-          </Button>
+          <ApplyCta
+            label={applyLabel}
+            href={applyHref}
+            size="md"
+            variant="gold"
+          />
         </div>
 
         <button
@@ -106,14 +117,13 @@ export function Header() {
                 </motion.a>
               ))}
             </nav>
-            <Button
-              href={siteConfig.links.apply}
+            <ApplyCta
+              label={applyLabel}
+              href={applyHref}
               size="lg"
               variant="gold"
               className={styles.mobileCta}
-            >
-              Apply Now
-            </Button>
+            />
           </motion.div>
         ) : null}
       </AnimatePresence>

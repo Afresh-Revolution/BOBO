@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { TableSkeleton } from "@/components/ui/Skeleton";
 import styles from "./DataTable.module.scss";
 
 export type Column<T> = {
@@ -40,14 +41,7 @@ export function DataTable<T>({
   selection,
 }: DataTableProps<T>) {
   if (loading) {
-    return (
-      <div className={styles.state} role="status">
-        <div className={styles.skeleton} />
-        <div className={styles.skeleton} />
-        <div className={styles.skeleton} />
-        <p>Loading…</p>
-      </div>
-    );
+    return <TableSkeleton rows={6} />;
   }
 
   if (!rows.length) {

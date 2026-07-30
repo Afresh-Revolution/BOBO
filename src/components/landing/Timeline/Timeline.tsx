@@ -15,12 +15,24 @@ type TimelineProps = {
   eyebrow?: string | null;
   title?: string | null;
   description?: string | null;
+  items?: {
+    id: string;
+    label: string;
+    date: string;
+    detail: string;
+  }[];
 };
 
 export function Timeline({
   eyebrow = "The Season",
   title = "Mark the dates.",
   description = "Portal opens August 1. Closes October 31. The show begins December 26.",
+  items = timeline as unknown as {
+    id: string;
+    label: string;
+    date: string;
+    detail: string;
+  }[],
 }: TimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +81,7 @@ export function Timeline({
           </div>
 
           <ol className={styles.list}>
-            {timeline.map((item, i) => (
+            {items.map((item, i) => (
               <Reveal key={item.id} delay={0.1 * i} as="li" className={styles.item}>
                 <span className={styles.dot} aria-hidden />
                 <p className={styles.date}>{item.date}</p>

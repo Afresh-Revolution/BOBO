@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getAdminFromCookies } from "@/lib/auth";
 import { jsonError, jsonOk } from "@/lib/api";
+import { revalidatePublicSite } from "@/lib/revalidate-site";
 import { z } from "zod";
 
 const winnerSchema = z.object({
@@ -84,6 +85,7 @@ export async function POST(req: Request) {
         })
       : await prisma.seasonWinner.create({ data });
 
+    revalidatePublicSite();
     return jsonOk({ data: serialize(row) });
   } catch (err) {
     console.error("[admin/winners POST]", err);

@@ -9,16 +9,52 @@ import { Sponsors } from "@/components/landing/Sponsors";
 import { getPublishedCms } from "@/lib/cms";
 import { getPublishedWinners } from "@/lib/winners";
 import { getPublishedNetworkPartners } from "@/lib/partners";
-import { siteConfig } from "@/lib/content";
+import { getPortalSettings } from "@/lib/portal";
+import { siteConfig, timeline as defaultTimeline, faqs as defaultFaqs } from "@/lib/content";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [cms, winners, partners] = await Promise.all([
+  const [cms, winners, partners, portal] = await Promise.all([
     getPublishedCms(),
     getPublishedWinners(),
     getPublishedNetworkPartners(),
+    getPortalSettings(),
   ]);
+
+  const timelineItems = defaultTimeline.map((item) => {
+    if (item.id === "opens") {
+      return {
+        ...item,
+        date: portal.openDateLabel,
+        detail: `Applications go live on ${portal.openDateLabel}. Eligibility checklist first.`,
+      };
+    }
+    if (item.id === "closes") {
+      return {
+        ...item,
+        date: portal.closeDateLabel,
+        detail: `Final day to submit your entry video and details (${portal.closeDateLabel}).`,
+      };
+    }
+    return { ...item };
+  });
+
+  const timelineDescription = `Portal opens ${portal.openDateLabel}. Closes ${portal.closeDateLabel}. The show begins ${siteConfig.show.showBegins}.`;
+
+  const faqItems = defaultFaqs.map((item) => {
+    if (item.q === "What happens after I apply?") {
+      return {
+        ...item,
+        a: `You'll receive a confirmation. If approved, a secure single-use email link arrives (valid for 48 hours) to complete registration. The application portal runs ${portal.openDateLabel} to ${portal.closeDateLabel}.`,
+      };
+    }
+    return { ...item };
+  });
+
+  const heroCtaLabel = portal.isAccepting
+    ? cms.hero?.ctaLabel || "Start Application"
+    : portal.ctaLabel;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -41,8 +77,8 @@ export default async function HomePage() {
         brand={cms.hero?.title || siteConfig.name}
         fullName={cms.hero?.subtitle || siteConfig.fullName}
         tagline={cms.hero?.body || siteConfig.tagline}
-        ctaLabel={cms.hero?.ctaLabel || "Start Application"}
-        ctaHref={cms.hero?.ctaHref || "/apply"}
+        ctaLabel={heroCtaLabel}
+        ctaHref={portal.ctaHref}
       />
       <About
         eyebrow={cms.about?.title}
@@ -52,12 +88,18 @@ export default async function HomePage() {
       <Timeline
         eyebrow={cms.timeline?.title}
         title={cms.timeline?.subtitle}
-        description={cms.timeline?.body}
+        description={cms.timeline?.body || timelineDescription}
+        items={timelineItems}
       />
-      <HowToApply />
+      <HowToApply
+        applyLabel={
+          portal.isAccepting ? "Begin Your Application" : portal.ctaLabel
+        }
+        applyHref={portal.ctaHref}
+      />
       <Eligibility />
       <Judging />
-      <FAQ />
+      <FAQ items={faqItems} />
       <Sponsors
         eyebrow={cms.sponsors?.title}
         title={cms.sponsors?.subtitle}
