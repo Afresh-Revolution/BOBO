@@ -44,6 +44,7 @@
   opacity: 0.55;
   pointer-events: none;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .seasonText {
@@ -62,9 +63,9 @@
 
 .portrait {
   position: relative;
-  width: min(100%, 18.5rem);
-  min-height: 20rem;
-  aspect-ratio: 4 / 5;
+  width: min(100%, 15rem);
+  height: 20rem;
+  flex-shrink: 0;
   overflow: visible;
   background: transparent;
 }
@@ -143,8 +144,8 @@
   }
 
   .portrait {
-    width: min(100%, 20rem);
-    min-height: 22rem;
+    width: min(100%, 16.5rem);
+    height: 18rem;
   }
 }
 

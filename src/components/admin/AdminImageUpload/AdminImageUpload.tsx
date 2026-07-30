@@ -18,7 +18,7 @@ type AdminImageUploadProps = {
 export function AdminImageUpload({
   value,
   onChange,
-  label = "Logo (optional)",
+  label = "Image (optional)",
   disabled,
 }: AdminImageUploadProps) {
   const inputId = useId();
@@ -95,8 +95,8 @@ export function AdminImageUpload({
           {uploading
             ? `Uploading… ${percent ?? 0}%`
             : value
-              ? "Click to replace logo"
-              : "Click to upload logo"}
+              ? "Click to replace"
+              : "Click to upload"}
         </span>
         <span className={styles.meta}>JPG, PNG, WEBP, or SVG · max 5MB</span>
       </label>
@@ -113,7 +113,7 @@ export function AdminImageUpload({
               onChange(null);
             }}
           >
-            Remove logo
+            Remove
           </AdminButton>
         </div>
       ) : null}

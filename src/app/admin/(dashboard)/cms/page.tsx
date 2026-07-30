@@ -544,21 +544,19 @@ export default function CmsPage() {
                         </label>
                       </>
                     ) : null}
-                    <label className={styles.field}>
-                      <span>Image URL (optional)</span>
-                      <input
-                        className={styles.input}
-                        value={draft.imageUrl}
-                        onChange={(e) =>
+                    <div className={styles.field}>
+                      <AdminImageUpload
+                        label="Image (optional)"
+                        value={draft.imageUrl || null}
+                        onChange={(url) =>
                           updateSectionDraft(
                             section.key,
-                            { imageUrl: e.target.value },
+                            { imageUrl: url ?? "" },
                             draft,
                           )
                         }
-                        placeholder="/winner.png or https://…"
                       />
-                    </label>
+                    </div>
                   </div>
 
                   <div className={styles.rowActions}>
@@ -846,22 +844,21 @@ export default function CmsPage() {
                         }
                       />
                     </label>
-                    <label className={styles.field}>
-                      <span>Image URL</span>
-                      <input
-                        className={styles.input}
-                        value={draft.imageUrl}
-                        onChange={(e) =>
+                    <div className={styles.field}>
+                      <AdminImageUpload
+                        label="Image"
+                        value={draft.imageUrl || null}
+                        onChange={(url) =>
                           setWinnerDrafts((prev) => ({
                             ...prev,
                             [winner.id]: {
                               ...(prev[winner.id] ?? draft),
-                              imageUrl: e.target.value,
+                              imageUrl: url ?? "/winner.png",
                             },
                           }))
                         }
                       />
-                    </label>
+                    </div>
                     <label className={styles.field}>
                       <span>Sort order</span>
                       <input
@@ -980,19 +977,22 @@ export default function CmsPage() {
                     }
                   />
                 </label>
-                <label className={styles.field}>
-                  <span>Image URL</span>
-                  <input
-                    className={styles.input}
-                    value={newWinner.imageUrl}
-                    onChange={(e) =>
+                <div className={styles.field}>
+                  <AdminImageUpload
+                    label="Image"
+                    value={
+                      newWinner.imageUrl === "/winner.png"
+                        ? null
+                        : newWinner.imageUrl || null
+                    }
+                    onChange={(url) =>
                       setNewWinner((prev) => ({
                         ...prev,
-                        imageUrl: e.target.value,
+                        imageUrl: url ?? "/winner.png",
                       }))
                     }
                   />
-                </label>
+                </div>
               </div>
               <div className={styles.rowActions}>
                 <AdminButton
