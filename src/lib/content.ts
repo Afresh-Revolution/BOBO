@@ -14,10 +14,10 @@ export const siteConfig = {
     instagram: "https://www.instagram.com/popin_club",
   },
   show: {
-    contestants: 15,
+    contestants: 20,
     winners: 1,
     duration: "1 Week",
-    portalOpens: "August 1",
+    portalOpens: "August 3",
     portalCloses: "October 31",
     showBegins: "December 26",
   },
@@ -29,13 +29,15 @@ export const siteConfig = {
     "Stylish",
     "Confident",
   ],
+  statement:
+    "20 baddies, 1 week, 1 crown, 1 winner. A stage for Nigerian excellence, filmed like fashion, judged like character.",
 } as const;
 
 export const timeline = [
   {
     id: "opens",
     label: "Portal Opens",
-    date: "August 1",
+    date: "August 3",
     detail: "Applications go live. Eligibility checklist first.",
   },
   {
@@ -48,7 +50,7 @@ export const timeline = [
     id: "begins",
     label: "Show Begins",
     date: "December 26",
-    detail: "15 contestants. One week. One BOBO winner.",
+    detail: "20 baddies, 1 week, 1 crown, 1 winner.",
   },
 ] as const;
 
@@ -145,7 +147,7 @@ export const faqs = [
   },
   {
     q: "How many contestants make the show?",
-    a: "15 contestants. One week. One winner.",
+    a: "20 baddies, 1 week, 1 crown, 1 winner.",
   },
   {
     q: "What happens after I apply?",

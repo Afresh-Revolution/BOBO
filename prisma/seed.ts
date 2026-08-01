@@ -1,8 +1,9 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, type Prisma } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { defaultLandingSections } from "../src/lib/cms-defaults";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -34,57 +35,30 @@ async function main() {
     },
   });
 
-  const sections = [
-    {
-      sectionKey: "hero",
-      title: "BOBO",
-      subtitle: "Battle Of Baddies On",
-      body: "Redefining what a Baddie truly means.",
-      ctaLabel: "Start Application",
-      ctaHref: "/apply",
-      sortOrder: 0,
-    },
-    {
-      sectionKey: "about",
-      title: "The Standard",
-      subtitle: "A Baddie is built on substance.",
-      body: "BOBO is redefining what a Baddie truly means — intelligence, elegance, purpose, class, style, and confidence.",
-      sortOrder: 1,
-    },
-    {
-      sectionKey: "timeline",
-      title: "The Season",
-      subtitle: "Mark the dates.",
-      body: "Portal opens August 1. Closes October 31. The show begins December 26.",
-      sortOrder: 2,
-    },
-    {
-      sectionKey: "faq",
-      title: "FAQ",
-      subtitle: "Answers, without the fluff.",
-      sortOrder: 3,
-    },
-    {
-      sectionKey: "sponsors",
-      title: "Partners",
-      subtitle: "Powered by the ecosystem.",
-      body: "Applications, voting, and registration live across the CBrilliance network.",
-      sortOrder: 4,
-    },
-  ];
-
-  for (const section of sections) {
+  for (const section of defaultLandingSections) {
+    const meta = section.meta as Prisma.InputJsonValue;
     await prisma.websiteContent.upsert({
       where: { sectionKey: section.sectionKey },
-      create: section,
+      create: {
+        sectionKey: section.sectionKey,
+        title: section.title,
+        subtitle: section.subtitle,
+        body: "body" in section ? (section.body as string) : null,
+        ctaLabel: "ctaLabel" in section ? (section.ctaLabel as string) : null,
+        ctaHref: "ctaHref" in section ? (section.ctaHref as string) : null,
+        sortOrder: section.sortOrder,
+        isPublished: true,
+        meta,
+      },
       update: {
         title: section.title,
         subtitle: section.subtitle,
-        body: "body" in section ? section.body : undefined,
-        ctaLabel: "ctaLabel" in section ? section.ctaLabel : undefined,
-        ctaHref: "ctaHref" in section ? section.ctaHref : undefined,
+        body: "body" in section ? (section.body as string) : null,
+        ctaLabel: "ctaLabel" in section ? (section.ctaLabel as string) : null,
+        ctaHref: "ctaHref" in section ? (section.ctaHref as string) : null,
         sortOrder: section.sortOrder,
         isPublished: true,
+        meta,
       },
     });
   }

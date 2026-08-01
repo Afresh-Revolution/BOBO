@@ -7,6 +7,7 @@ import {
   BulkSelectBar,
   useConfirm,
 } from "@/components/admin";
+import { MediaGridSkeleton } from "@/components/ui/Skeleton";
 import { adminFetch, formatDate, unwrapList } from "@/lib/admin-api";
 import { confirmAndBulkDelete } from "@/lib/admin-delete";
 import type { MediaItem } from "@/lib/admin-types";
@@ -86,7 +87,7 @@ export default function MediaPage() {
       ) : null}
 
       {loading ? (
-        <p className={styles.muted}>Loading media…</p>
+        <MediaGridSkeleton count={8} />
       ) : items.length === 0 ? (
         <div className={styles.panel}>
           <p className={styles.panelTitle}>No media yet</p>

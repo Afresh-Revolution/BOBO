@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminShell, StatCard } from "@/components/admin";
+import { StatsSkeleton } from "@/components/ui/Skeleton";
 import { adminFetch } from "@/lib/admin-api";
 import type { DashboardStats } from "@/lib/admin-types";
 import { useAdminResource } from "@/lib/use-admin-resource";
@@ -47,38 +48,42 @@ export default function AdminDashboardPage() {
     >
       {error ? <p className={styles.error}>{error}</p> : null}
 
-      <div className={styles.stats}>
-        <StatCard
-          label="Applications"
-          value={loading ? "N/A" : s.applications}
-          accent="purple"
-          hint="Total submissions"
-        />
-        <StatCard
-          label="Pending"
-          value={loading ? "N/A" : s.pending}
-          accent="gold"
-          hint="Awaiting review"
-        />
-        <StatCard
-          label="Approved"
-          value={loading ? "N/A" : s.approved}
-          accent="neutral"
-          hint="Ready to register"
-        />
-        <StatCard
-          label="Registered"
-          value={loading ? "N/A" : s.registered}
-          accent="purple"
-          hint="Paid & confirmed"
-        />
-        <StatCard
-          label="Payments"
-          value={loading ? "N/A" : s.payments}
-          accent="gold"
-          hint={s.revenue != null ? `Revenue tracked` : "Successful charges"}
-        />
-      </div>
+      {loading ? (
+        <StatsSkeleton count={5} />
+      ) : (
+        <div className={styles.stats}>
+          <StatCard
+            label="Applications"
+            value={s.applications}
+            accent="purple"
+            hint="Total submissions"
+          />
+          <StatCard
+            label="Pending"
+            value={s.pending}
+            accent="gold"
+            hint="Awaiting review"
+          />
+          <StatCard
+            label="Approved"
+            value={s.approved}
+            accent="neutral"
+            hint="Ready to register"
+          />
+          <StatCard
+            label="Registered"
+            value={s.registered}
+            accent="purple"
+            hint="Paid & confirmed"
+          />
+          <StatCard
+            label="Payments"
+            value={s.payments}
+            accent="gold"
+            hint={s.revenue != null ? `Revenue tracked` : "Successful charges"}
+          />
+        </div>
+      )}
     </AdminShell>
   );
 }

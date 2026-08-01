@@ -11,6 +11,7 @@ import {
   siteConfig,
 } from "@/lib/content";
 import { uploadToCloudinary } from "@/lib/upload-client";
+import { PanelFormSkeleton } from "@/components/ui/Skeleton";
 import styles from "./accept.module.scss";
 
 type AcceptStatus =
@@ -247,15 +248,7 @@ export function AcceptClient() {
     return (
       <div className={styles.shell}>
         <div className={`container ${styles.inner}`}>
-          <motion.div
-            className={styles.panel}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <p className={styles.eyebrow}>Verifying link</p>
-            <h1>Opening your acceptance…</h1>
-            <p className={styles.copy}>Please wait a moment.</p>
-          </motion.div>
+          <PanelFormSkeleton fields={4} />
         </div>
       </div>
     );

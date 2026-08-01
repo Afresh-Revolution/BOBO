@@ -1,24 +1,49 @@
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
-import { eligibility, siteConfig } from "@/lib/content";
+import { eligibility as defaultEligibility, siteConfig } from "@/lib/content";
 import styles from "./Eligibility.module.scss";
 
-export function Eligibility() {
+type EligibilityProps = {
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  items?: string[];
+  note?: string | null;
+  primaryCtaLabel?: string;
+  primaryCtaHref?: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaHref?: string;
+};
+
+export function Eligibility({
+  eyebrow = "Eligibility",
+  title = "You must satisfy every requirement.",
+  description = "Before the form opens, confirm you meet all four criteria. Incomplete profiles will not proceed.",
+  items = [...defaultEligibility],
+  note = "Need a CBrilliance account? Create one first. It is required for applications and for voting on Popin.",
+  primaryCtaLabel = "Get CBrilliance",
+  primaryCtaHref = siteConfig.links.cbrilliance,
+  secondaryCtaLabel = "Visit Popin",
+  secondaryCtaHref = siteConfig.links.popin,
+}: EligibilityProps) {
   return (
     <section id="eligibility" className={styles.section}>
       <div className={`container ${styles.layout}`}>
         <Reveal>
           <SectionHeader
-            eyebrow="Eligibility"
-            title="You must satisfy every requirement."
-            description="Before the form opens, confirm you meet all four criteria. Incomplete profiles will not proceed."
+            eyebrow={eyebrow || "Eligibility"}
+            title={title || "You must satisfy every requirement."}
+            description={
+              description ||
+              "Before the form opens, confirm you meet all four criteria. Incomplete profiles will not proceed."
+            }
             tone="dark"
           />
         </Reveal>
 
         <ul className={styles.list}>
-          {eligibility.map((item, i) => (
+          {items.map((item, i) => (
             <Reveal key={item} delay={0.08 * i} as="li" className={styles.item}>
               <span className={styles.check} aria-hidden>
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
@@ -37,21 +62,13 @@ export function Eligibility() {
         </ul>
 
         <Reveal delay={0.25} className={styles.note}>
-          <p>
-            Need a CBrilliance account? Create one first. It is required for applications
-            and for voting on Popin.
-          </p>
+          <p>{note}</p>
           <div className={styles.links}>
-            <Button
-              href={siteConfig.links.cbrilliance}
-              external
-              variant="gold"
-              size="md"
-            >
-              Get CBrilliance
+            <Button href={primaryCtaHref} external variant="gold" size="md">
+              {primaryCtaLabel}
             </Button>
-            <Button href={siteConfig.links.popin} external variant="secondary" size="md">
-              Visit Popin
+            <Button href={secondaryCtaHref} external variant="secondary" size="md">
+              {secondaryCtaLabel}
             </Button>
           </div>
         </Reveal>

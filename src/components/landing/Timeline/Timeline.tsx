@@ -26,7 +26,7 @@ type TimelineProps = {
 export function Timeline({
   eyebrow = "The Season",
   title = "Mark the dates.",
-  description = "Portal opens August 1. Closes October 31. The show begins December 26.",
+  description = "Portal opens August 3. Closes October 31. The show begins December 26.",
   items = timeline as unknown as {
     id: string;
     label: string;
@@ -69,7 +69,7 @@ export function Timeline({
             title={title || "Mark the dates."}
             description={
               description ||
-              "Portal opens August 1. Closes October 31. The show begins December 26."
+              "Portal opens August 3. Closes October 31. The show begins December 26."
             }
             tone="dark"
           />

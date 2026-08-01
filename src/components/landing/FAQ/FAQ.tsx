@@ -4,14 +4,23 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import type { FaqItem } from "@/lib/cms-landing";
 import { faqs } from "@/lib/content";
 import styles from "./FAQ.module.scss";
 
 type FAQProps = {
-  items?: { q: string; a: string }[];
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  items?: FaqItem[];
 };
 
-export function FAQ({ items = faqs as unknown as { q: string; a: string }[] }: FAQProps) {
+export function FAQ({
+  eyebrow = "FAQ",
+  title = "Answers, without the fluff.",
+  description = "Everything applicants ask before hitting submit.",
+  items = faqs as unknown as FaqItem[],
+}: FAQProps) {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
@@ -19,9 +28,11 @@ export function FAQ({ items = faqs as unknown as { q: string; a: string }[] }: F
       <div className={`container ${styles.layout}`}>
         <Reveal>
           <SectionHeader
-            eyebrow="FAQ"
-            title="Answers, without the fluff."
-            description="Everything applicants ask before hitting submit."
+            eyebrow={eyebrow || "FAQ"}
+            title={title || "Answers, without the fluff."}
+            description={
+              description || "Everything applicants ask before hitting submit."
+            }
           />
         </Reveal>
 
@@ -32,7 +43,7 @@ export function FAQ({ items = faqs as unknown as { q: string; a: string }[] }: F
             const buttonId = `faq-button-${i}`;
 
             return (
-              <Reveal key={item.q} delay={0.04 * i} className={styles.item} as="div">
+              <Reveal key={`${item.q}-${i}`} delay={0.04 * i} className={styles.item} as="div">
                 <h3>
                   <button
                     id={buttonId}
@@ -43,7 +54,12 @@ export function FAQ({ items = faqs as unknown as { q: string; a: string }[] }: F
                     onClick={() => setOpen(isOpen ? null : i)}
                   >
                     <span>{item.q}</span>
-                    <span className={[styles.icon, isOpen ? styles.iconOpen : ""].join(" ")} aria-hidden>
+                    <span
+                      className={[styles.icon, isOpen ? styles.iconOpen : ""].join(
+                        " ",
+                      )}
+                      aria-hidden
+                    >
                       <span />
                       <span />
                     </span>

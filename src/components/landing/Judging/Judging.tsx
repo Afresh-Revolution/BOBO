@@ -1,23 +1,39 @@
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { judging } from "@/lib/content";
+import type { JudgingCard } from "@/lib/cms-landing";
+import { judging as defaultJudging } from "@/lib/content";
 import styles from "./Judging.module.scss";
 
-export function Judging() {
+type JudgingProps = {
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  cards?: JudgingCard[];
+};
+
+export function Judging({
+  eyebrow = "Judging Process",
+  title = "Presence. Substance. Character. Style.",
+  description = "Every applicant is reviewed with the same lens: no shortcuts, no noise.",
+  cards = [...defaultJudging],
+}: JudgingProps) {
   return (
     <section id="judging" className={styles.section}>
       <div className="container">
         <Reveal>
           <SectionHeader
-            eyebrow="Judging Process"
-            title="Presence. Substance. Character. Style."
-            description="Every applicant is reviewed with the same lens: no shortcuts, no noise."
+            eyebrow={eyebrow || "Judging Process"}
+            title={title || "Presence. Substance. Character. Style."}
+            description={
+              description ||
+              "Every applicant is reviewed with the same lens: no shortcuts, no noise."
+            }
             align="center"
           />
         </Reveal>
 
         <div className={styles.grid}>
-          {judging.map((item, i) => (
+          {cards.map((item, i) => (
             <Reveal key={item.title} delay={0.08 * i} className={styles.card}>
               <span className={styles.mark} aria-hidden />
               <h3>{item.title}</h3>

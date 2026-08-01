@@ -3,10 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { adminFetch } from "@/lib/admin-api";
 import type { AdminUser } from "@/lib/admin-types";
 import { AdminButton } from "../AdminButton";
+import { AdminBootSkeleton } from "@/components/ui/Skeleton";
 import styles from "./AdminShell.module.scss";
 
 const NAV = [
@@ -41,6 +42,9 @@ export function AdminShell({
   const [checking, setChecking] = useState(true);
   const [navOpen, setNavOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [topbarRevealed, setTopbarRevealed] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,6 +75,37 @@ export function AdminShell({
     };
   }, [router]);
 
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      const prev = lastScrollY.current;
+      const scrollingDown = y > prev;
+
+      // Solid sticky bar once past the top; keep it revealed while scrolling down
+      // or while already past the threshold. Hide the elevated state near the top.
+      if (y < 24) {
+        setTopbarRevealed(false);
+      } else if (scrollingDown || y > 80) {
+        setTopbarRevealed(true);
+      }
+
+      setShowScrollTop(y > 480);
+      lastScrollY.current = y;
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Reset scroll UI when navigating between admin pages
+  useEffect(() => {
+    setTopbarRevealed(false);
+    setShowScrollTop(false);
+    lastScrollY.current = 0;
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [pathname]);
+
   async function handleLogout() {
     setLoggingOut(true);
     try {
@@ -89,11 +124,7 @@ export function AdminShell({
   }
 
   if (checking) {
-    return (
-      <div className={styles.boot}>
-        <p>Verifying session…</p>
-      </div>
-    );
+    return <AdminBootSkeleton />;
   }
 
   return (
@@ -153,7 +184,14 @@ export function AdminShell({
       ) : null}
 
       <div className={styles.main}>
-        <header className={styles.topbar}>
+        <header
+          className={[
+            styles.topbar,
+            topbarRevealed ? styles.topbarRevealed : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
           <button
             type="button"
             className={styles.menuBtn}
@@ -172,6 +210,25 @@ export function AdminShell({
         </header>
         <div className={styles.content}>{children}</div>
       </div>
+
+      <button
+        type="button"
+        className={[styles.scrollTop, showScrollTop ? styles.scrollTopVisible : ""]
+          .filter(Boolean)
+          .join(" ")}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Scroll to top"
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden>
+          <path
+            d="M12 5v14M5 12l7-7 7 7"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
     </div>
   );
 }

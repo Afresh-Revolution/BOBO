@@ -9,27 +9,22 @@ import {
 } from "@/components/admin";
 import { adminFetch, unwrapList } from "@/lib/admin-api";
 import type { CmsSection } from "@/lib/admin-types";
+import {
+  LANDING_SECTION_HINTS,
+  LANDING_SECTION_KEYS,
+  LANDING_SECTION_LABELS,
+  type LandingSectionKey,
+  defaultLandingSections,
+} from "@/lib/cms-defaults";
 import { useAdminResource } from "@/lib/use-admin-resource";
+import {
+  CmsSectionFields,
+  contentFromDraft,
+  draftFromContent,
+  type SectionDraft,
+} from "./CmsSectionFields";
+import { CmsSkeleton } from "@/components/ui/Skeleton";
 import styles from "../admin.module.scss";
-
-const SECTION_KEYS = ["hero", "about", "timeline", "faq", "sponsors"] as const;
-
-const SECTION_LABELS: Record<(typeof SECTION_KEYS)[number], string> = {
-  hero: "Hero",
-  about: "About",
-  timeline: "Timeline",
-  faq: "FAQ",
-  sponsors: "Sponsors",
-};
-
-type SectionDraft = {
-  title: string;
-  subtitle: string;
-  body: string;
-  ctaLabel: string;
-  ctaHref: string;
-  imageUrl: string;
-};
 
 type WinnerRow = {
   id: string;
@@ -70,23 +65,37 @@ type PartnerDraft = {
 };
 
 function emptySections(): CmsSection[] {
-  return SECTION_KEYS.map((key) => ({
-    key,
-    title: SECTION_LABELS[key],
-    content: {},
-  }));
+  return LANDING_SECTION_KEYS.map((key) => {
+    const defaults = defaultLandingSections.find((s) => s.sectionKey === key);
+    return {
+      key,
+      title: defaults?.title || LANDING_SECTION_LABELS[key],
+      content: {
+        subtitle: defaults?.subtitle ?? null,
+        body:
+          defaults && "body" in defaults
+            ? ((defaults as { body?: string }).body ?? null)
+            : null,
+        ctaLabel:
+          defaults && "ctaLabel" in defaults
+            ? ((defaults as { ctaLabel?: string }).ctaLabel ?? null)
+            : null,
+        ctaHref:
+          defaults && "ctaHref" in defaults
+            ? ((defaults as { ctaHref?: string }).ctaHref ?? null)
+            : null,
+        ...(defaults?.meta || {}),
+      },
+    };
+  });
 }
 
 function draftFromSection(section: CmsSection): SectionDraft {
-  const c = section.content || {};
-  return {
-    title: section.title || "",
-    subtitle: typeof c.subtitle === "string" ? c.subtitle : "",
-    body: typeof c.body === "string" ? c.body : "",
-    ctaLabel: typeof c.ctaLabel === "string" ? c.ctaLabel : "",
-    ctaHref: typeof c.ctaHref === "string" ? c.ctaHref : "",
-    imageUrl: typeof c.imageUrl === "string" ? c.imageUrl : "",
-  };
+  return draftFromContent(
+    section.title || "",
+    section.content || {},
+    section.key as LandingSectionKey,
+  );
 }
 
 function emptyWinnerDraft(): WinnerDraft {
@@ -159,15 +168,10 @@ export default function CmsPage() {
       const res = await adminFetch("/api/admin/cms");
       const list = unwrapList<CmsSection>(res as never);
       const byKey = new Map(list.map((s) => [s.key, s]));
-      return SECTION_KEYS.map((key) => {
+      return LANDING_SECTION_KEYS.map((key) => {
         const existing = byKey.get(key);
-        return (
-          existing ?? {
-            key,
-            title: SECTION_LABELS[key],
-            content: {},
-          }
-        );
+        if (existing) return existing;
+        return emptySections().find((s) => s.key === key)!;
       });
     },
     mapError: (err) =>
@@ -234,7 +238,7 @@ export default function CmsPage() {
     }));
   }
 
-  async function saveSection(key: string, base: SectionDraft) {
+  async function saveSection(key: LandingSectionKey, base: SectionDraft) {
     setSaving(`section:${key}`);
     setMessage(null);
     setLocalError(null);
@@ -245,16 +249,10 @@ export default function CmsPage() {
         method: "PUT",
         body: {
           title: draft.title,
-          content: {
-            subtitle: draft.subtitle || null,
-            body: draft.body || null,
-            ctaLabel: draft.ctaLabel || null,
-            ctaHref: draft.ctaHref || null,
-            imageUrl: draft.imageUrl || null,
-          },
+          content: contentFromDraft(key, draft),
         },
       });
-      setMessage(`Saved “${SECTION_LABELS[key as keyof typeof SECTION_LABELS] || key}”`);
+      setMessage(`Saved “${LANDING_SECTION_LABELS[key]}”`);
       setDrafts((prev) => {
         const next = { ...prev };
         delete next[key];
@@ -440,7 +438,7 @@ export default function CmsPage() {
   return (
     <AdminShell
       title="CMS"
-      description="Edit landing page copy, network partners, and season winners."
+      description="Edit every landing page section, network partners, and season winners."
       actions={
         <AdminButton variant="secondary" size="sm" onClick={handleReload}>
           Reload
@@ -451,122 +449,46 @@ export default function CmsPage() {
       {message ? <p className={styles.muted}>{message}</p> : null}
 
       {loading ? (
-        <p className={styles.muted}>Loading CMS…</p>
+        <CmsSkeleton sections={5} />
       ) : (
         <>
           <section className={styles.sectionList} aria-label="Page sections">
             <h2 className={styles.panelTitle}>Landing sections</h2>
+            <p className={styles.muted}>
+              Editable landing sections: Hero, About, Timeline (milestones), How
+              To Apply (steps), Eligibility, Judging, FAQ (Q&amp;As), and
+              Sponsors. Scroll each card to edit lists, then Save that section.
+            </p>
             {sections.map((section) => {
+              const key = section.key as LandingSectionKey;
               const draft = sectionDraft(section);
               return (
                 <article key={section.key} className={styles.sectionCard}>
                   <div>
                     <h3 className={styles.panelTitle}>
-                      {SECTION_LABELS[
-                        section.key as keyof typeof SECTION_LABELS
-                      ] || section.key}
+                      {LANDING_SECTION_LABELS[key] || section.key}
                     </h3>
-                    <p className={styles.muted}>Key: {section.key}</p>
+                    <p className={styles.muted}>
+                      Key: {section.key}. {LANDING_SECTION_HINTS[key]}
+                    </p>
                   </div>
 
-                  <div className={styles.fieldGrid}>
-                    <label className={styles.field}>
-                      <span>Title / brand</span>
-                      <input
-                        className={styles.input}
-                        value={draft.title}
-                        onChange={(e) =>
-                          updateSectionDraft(
-                            section.key,
-                            { title: e.target.value },
-                            draft,
-                          )
-                        }
-                      />
-                    </label>
-                    <label className={styles.field}>
-                      <span>Subtitle</span>
-                      <input
-                        className={styles.input}
-                        value={draft.subtitle}
-                        onChange={(e) =>
-                          updateSectionDraft(
-                            section.key,
-                            { subtitle: e.target.value },
-                            draft,
-                          )
-                        }
-                      />
-                    </label>
-                    <label className={styles.field}>
-                      <span>Body</span>
-                      <textarea
-                        className={styles.textarea}
-                        value={draft.body}
-                        onChange={(e) =>
-                          updateSectionDraft(
-                            section.key,
-                            { body: e.target.value },
-                            draft,
-                          )
-                        }
-                      />
-                    </label>
-                    {section.key === "hero" ? (
-                      <>
-                        <label className={styles.field}>
-                          <span>CTA label</span>
-                          <input
-                            className={styles.input}
-                            value={draft.ctaLabel}
-                            onChange={(e) =>
-                              updateSectionDraft(
-                                section.key,
-                                { ctaLabel: e.target.value },
-                                draft,
-                              )
-                            }
-                          />
-                        </label>
-                        <label className={styles.field}>
-                          <span>CTA link</span>
-                          <input
-                            className={styles.input}
-                            value={draft.ctaHref}
-                            onChange={(e) =>
-                              updateSectionDraft(
-                                section.key,
-                                { ctaHref: e.target.value },
-                                draft,
-                              )
-                            }
-                          />
-                        </label>
-                      </>
-                    ) : null}
-                    <div className={styles.field}>
-                      <AdminImageUpload
-                        label="Image (optional)"
-                        value={draft.imageUrl || null}
-                        onChange={(url) =>
-                          updateSectionDraft(
-                            section.key,
-                            { imageUrl: url ?? "" },
-                            draft,
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
+                  <CmsSectionFields
+                    sectionKey={key}
+                    draft={draft}
+                    onChange={(patch) =>
+                      updateSectionDraft(section.key, patch, draft)
+                    }
+                  />
 
                   <div className={styles.rowActions}>
                     <AdminButton
                       variant="gold"
                       size="sm"
                       loading={saving === `section:${section.key}`}
-                      onClick={() => void saveSection(section.key, draft)}
+                      onClick={() => void saveSection(key, draft)}
                     >
-                      Save {SECTION_LABELS[section.key as keyof typeof SECTION_LABELS] || section.key}
+                      Save {LANDING_SECTION_LABELS[key] || section.key}
                     </AdminButton>
                   </div>
                 </article>

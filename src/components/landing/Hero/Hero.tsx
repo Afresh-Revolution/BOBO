@@ -15,8 +15,11 @@ type HeroProps = {
   brand?: string;
   fullName?: string;
   tagline?: string;
+  support?: string;
   ctaLabel?: string;
   ctaHref?: string | null;
+  secondaryCtaLabel?: string;
+  secondaryCtaHref?: string;
 };
 
 export function Hero({
@@ -24,8 +27,11 @@ export function Hero({
   brand = siteConfig.name,
   fullName = siteConfig.fullName,
   tagline = siteConfig.tagline,
+  support = "A Nigerian reality show for the intelligent, elegant, and purpose-driven, not merely the attractive.",
   ctaLabel = "Start Application",
   ctaHref = siteConfig.links.apply,
+  secondaryCtaLabel = "Discover BOBO",
+  secondaryCtaHref = "#about",
 }: HeroProps) {
   const rootRef = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
@@ -105,8 +111,7 @@ export function Hero({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.32, ease: [0.16, 1, 0.3, 1] }}
           >
-            A Nigerian reality show for the intelligent, elegant, and purpose-driven,
-            not merely the attractive.
+            {support}
           </motion.p>
 
           <motion.div
@@ -123,8 +128,8 @@ export function Hero({
             >
               {ctaLabel}
             </Button>
-            <Button href="#about" variant="secondary" size="lg">
-              Discover BOBO
+            <Button href={secondaryCtaHref} variant="secondary" size="lg">
+              {secondaryCtaLabel}
             </Button>
           </motion.div>
         </div>

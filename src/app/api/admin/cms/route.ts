@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { getAdminFromCookies } from "@/lib/auth";
 import { jsonError, jsonOk } from "@/lib/api";
 import { revalidatePublicSite } from "@/lib/revalidate-site";
+import { ensureLandingCmsSections } from "@/lib/ensure-landing-cms";
 import type { Prisma } from "@prisma/client";
 
 type CmsContent = Record<string, unknown>;
@@ -51,6 +52,8 @@ export async function GET() {
   try {
     const admin = await getAdminFromCookies();
     if (!admin) return jsonError("Unauthorized", 401);
+
+    await ensureLandingCmsSections();
 
     const sections = await prisma.websiteContent.findMany({
       orderBy: { sortOrder: "asc" },
