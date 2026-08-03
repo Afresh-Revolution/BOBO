@@ -1,12 +1,16 @@
 import { prisma } from "@/lib/db";
-import { getAdminFromCookies, requireRole } from "@/lib/auth";
+import {
+  requireRole,
+} from "@/lib/auth";
+import { requireAdminApi } from "@/lib/security/admin-api";
 import { jsonError, jsonOk, clientIp } from "@/lib/api";
 import { parseIdList } from "@/lib/admin-bulk";
 
 export async function POST(req: Request) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     if (!requireRole(admin, ["SUPER_ADMIN"])) {
       return jsonError("Only SUPER_ADMIN can delete admins.", 403);

@@ -90,6 +90,7 @@ export function ApplyFlow({ portal }: ApplyFlowProps) {
       facebookUrl: "",
       historyOfAilments: "",
       currentHealthChallenge: "",
+      website: "",
     },
   });
 
@@ -144,6 +145,7 @@ export function ApplyFlow({ portal }: ApplyFlowProps) {
         historyOfAilments: values.historyOfAilments,
         currentHealthChallenge: values.currentHealthChallenge,
         promptChoice: values.promptChoice,
+        website: values.website || "",
         birthCertificate: media.birthCertificate,
         entryVideo: media.entryVideo,
       };
@@ -365,6 +367,16 @@ export function ApplyFlow({ portal }: ApplyFlowProps) {
                 onSubmit={handleSubmit(onSubmit)}
                 noValidate
               >
+                <div className={styles.hp} aria-hidden="true">
+                  <label htmlFor="website">Website</label>
+                  <input
+                    id="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    {...register("website")}
+                  />
+                </div>
                 <fieldset className={styles.fieldset} disabled={busy}>
                   <legend>Profile</legend>
                   <div className={styles.grid}>

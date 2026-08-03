@@ -15,6 +15,8 @@ export type UploadSignResponse = {
   publicId?: string;
   resourceType?: "image" | "video" | "raw" | "auto";
   uploadPreset?: string;
+  allowedFormats?: string;
+  maxBytes?: number;
 };
 
 export type UploadProgress = {
@@ -113,6 +115,13 @@ export async function uploadToCloudinary(
   const sign = await requestSignature(kind, file.name, options?.token);
   const resourceType = sign.resourceType ?? (kind === "entryVideo" ? "video" : "auto");
 
+  if (sign.maxBytes && file.size > sign.maxBytes) {
+    throw new UploadError(
+      `File is too large. Maximum size is ${Math.round(sign.maxBytes / (1024 * 1024))}MB.`,
+      413,
+    );
+  }
+
   const form = new FormData();
   form.append("file", file);
   form.append("api_key", sign.apiKey);
@@ -122,6 +131,9 @@ export async function uploadToCloudinary(
 
   if (sign.publicId) {
     form.append("public_id", sign.publicId);
+  }
+  if (sign.allowedFormats) {
+    form.append("allowed_formats", sign.allowedFormats);
   }
 
   if (sign.uploadPreset) {

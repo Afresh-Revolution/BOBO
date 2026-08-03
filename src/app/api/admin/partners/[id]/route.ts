@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { getAdminFromCookies } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/security/admin-api";
 import { jsonError, jsonOk } from "@/lib/api";
 import { revalidatePublicSite } from "@/lib/revalidate-site";
 import { z } from "zod";
@@ -52,8 +52,9 @@ function serialize(row: {
 
 export async function PATCH(req: Request, ctx: RouteContext) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const { id } = await ctx.params;
     const body = await req.json().catch(() => null);
@@ -80,10 +81,11 @@ export async function PATCH(req: Request, ctx: RouteContext) {
   }
 }
 
-export async function DELETE(_req: Request, ctx: RouteContext) {
+export async function DELETE(req: Request, ctx: RouteContext) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const { id } = await ctx.params;
     const existing = await prisma.networkPartner.findFirst({

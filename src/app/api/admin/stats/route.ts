@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/db";
-import { getAdminFromCookies } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/security/admin-api";
 import { jsonError, jsonOk } from "@/lib/api";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
 
     const [applications, pending, approved, registered, payments, revenueAgg] =
       await Promise.all([

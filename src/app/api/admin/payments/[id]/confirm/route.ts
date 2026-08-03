@@ -1,15 +1,16 @@
 import { prisma } from "@/lib/db";
-import { getAdminFromCookies } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/security/admin-api";
 import { jsonError, jsonOk, clientIp } from "@/lib/api";
 import { emailPaymentConfirmation } from "@/lib/email";
 import { serializePayment } from "@/lib/serializers";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-export async function POST(_req: Request, ctx: RouteContext) {
+export async function POST(req: Request, ctx: RouteContext) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const { id } = await ctx.params;
     const payment = await prisma.payment.findUnique({
@@ -39,7 +40,7 @@ export async function POST(_req: Request, ctx: RouteContext) {
     }
 
     const now = new Date();
-    const ip = clientIp(_req);
+    const ip = clientIp(req);
 
     const result = await prisma.$transaction(async (tx) => {
       const updatedPayment = await tx.payment.update({
@@ -100,7 +101,7 @@ export async function POST(_req: Request, ctx: RouteContext) {
           entity: "Payment",
           entityId: payment.id,
           ip,
-          userAgent: _req.headers.get("user-agent") || undefined,
+          userAgent: req.headers.get("user-agent") || undefined,
           meta: {
             applicationId: payment.applicationId,
             reference: payment.reference,

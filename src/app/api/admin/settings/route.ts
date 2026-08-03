@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/db";
-import { getAdminFromCookies } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/security/admin-api";
 import { jsonError, jsonOk } from "@/lib/api";
 import { registrationFee } from "@/lib/content";
 import { revalidatePublicSite } from "@/lib/revalidate-site";
+import { writeAudit } from "@/lib/security/audit";
 
 const SETTING_DEFS: {
   key: string;
@@ -86,10 +87,11 @@ function unwrapValue(
   return str;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const rows = await prisma.setting.findMany();
     const byKey = new Map(
@@ -118,8 +120,9 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const body = (await req.json().catch(() => null)) as {
       settings?: {
@@ -156,6 +159,15 @@ export async function PUT(req: Request) {
     }
 
     revalidatePublicSite();
+    await writeAudit({
+      adminId: admin.id,
+      action: "settings.update",
+      entity: "Setting",
+      req,
+      meta: {
+        keys: settings.map((s) => s.key).filter((k) => allowed.has(k)),
+      },
+    });
     return jsonOk({ message: "Settings saved" });
   } catch (err) {
     console.error("[admin/settings PUT]", err);

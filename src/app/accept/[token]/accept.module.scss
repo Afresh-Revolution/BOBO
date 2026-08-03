@@ -305,6 +305,15 @@
   max-width: 36rem;
 }
 
+.hp {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 @media (max-width: 560px) {
   .shell {
     padding-top: calc(var(--header-h) + 1.5rem);

@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { jsonError, jsonOk, rateLimit, clientIp } from "@/lib/api";
 import { emailApplicationReceived } from "@/lib/email";
 import { getPortalSettings } from "@/lib/portal";
+import { assertSameOrigin } from "@/lib/security/csrf";
+import { assertHumanSubmission } from "@/lib/security/bot-guard";
 import {
   applicationSubmitSchema,
   emptySocialLinkToNull,
@@ -9,6 +11,9 @@ import {
 
 export async function POST(req: Request) {
   try {
+    const csrf = assertSameOrigin(req);
+    if (csrf) return csrf;
+
     const portal = await getPortalSettings();
     if (!portal.isAccepting) {
       return jsonError(portal.statusMessage || "Applications are closed.", 403);
@@ -28,6 +33,16 @@ export async function POST(req: Request) {
     }
 
     const data = parsed.data;
+    const bot = await assertHumanSubmission({
+      website: data.website,
+      turnstileToken:
+        typeof (body as { turnstileToken?: unknown } | null)?.turnstileToken ===
+        "string"
+          ? (body as { turnstileToken: string }).turnstileToken
+          : undefined,
+    });
+    if (bot) return bot;
+
     const email = data.email.trim().toLowerCase();
     const ip = clientIp(req);
     const limited = rateLimit(`applications:${ip}:${email}`, 5, 60 * 60 * 1000);

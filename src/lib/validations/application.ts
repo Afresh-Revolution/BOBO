@@ -226,6 +226,8 @@ export const applicationFormSchema = applicationFieldsSchema
       .refine((f) => f.size > 0, "Upload your entry video.")
       .refine((f) => f.size <= VIDEO_MAX_BYTES, "Video must be 100MB or less.")
       .refine(isAllowedVideo, "Video must be MP4, MOV, or AVI."),
+    /** Honeypot — leave empty. */
+    website: z.string().max(0),
   })
   .superRefine(requireTwoSocialLinks);
 
@@ -247,6 +249,8 @@ export const applicationSubmitSchema = applicationFieldsSchema
   .extend({
     birthCertificate: mediaAssetSchema,
     entryVideo: mediaAssetSchema,
+    /** Honeypot — must be empty (bots often fill hidden fields). */
+    website: z.string().max(0).optional(),
   })
   .superRefine(requireTwoSocialLinks);
 

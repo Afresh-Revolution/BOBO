@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/db";
-import { appUrl, getAdminFromCookies } from "@/lib/auth";
+import {
+  appUrl,
+} from "@/lib/auth";
+import { requireAdminApi } from "@/lib/security/admin-api";
 import { jsonError, jsonOk, clientIp } from "@/lib/api";
 import {
   emailApplicationApproved,
@@ -12,10 +15,11 @@ import type { Prisma } from "@prisma/client";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-export async function GET(_req: Request, ctx: RouteContext) {
+export async function GET(req: Request, ctx: RouteContext) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const { id } = await ctx.params;
     const app = await prisma.application.findUnique({
@@ -33,8 +37,9 @@ export async function GET(_req: Request, ctx: RouteContext) {
 
 export async function PATCH(req: Request, ctx: RouteContext) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const { id } = await ctx.params;
     const body = (await req.json().catch(() => null)) as {

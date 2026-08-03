@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import { createHash, randomBytes } from "crypto";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,26 +16,63 @@ export type SignKind =
   | "adminMedia"
   | "cbcReceipt";
 
-export function signUpload(kind: SignKind, filename?: string) {
+const KIND_RULES: Record<
+  SignKind,
+  {
+    folder: string;
+    resourceType: "image" | "video" | "auto" | "raw";
+    allowedFormats: string;
+    maxBytes: number;
+  }
+> = {
+  birthCertificate: {
+    folder: "bobo/certificates",
+    resourceType: "image",
+    allowedFormats: "jpg,jpeg,png,webp,pdf",
+    maxBytes: 10 * 1024 * 1024,
+  },
+  entryVideo: {
+    folder: "bobo/videos",
+    resourceType: "video",
+    allowedFormats: "mp4,mov,avi",
+    maxBytes: 100 * 1024 * 1024,
+  },
+  adminMedia: {
+    folder: "bobo/media",
+    resourceType: "auto",
+    allowedFormats: "jpg,jpeg,png,webp,gif,mp4,mov,pdf",
+    maxBytes: 25 * 1024 * 1024,
+  },
+  cbcReceipt: {
+    folder: "bobo/receipts",
+    resourceType: "image",
+    allowedFormats: "jpg,jpeg,png,webp,pdf",
+    maxBytes: 10 * 1024 * 1024,
+  },
+};
+
+/** Opaque public_id — never expose original filenames. */
+function securePublicId(kind: SignKind) {
+  const stamp = Date.now().toString(36);
+  const rand = randomBytes(8).toString("hex");
+  const hash = createHash("sha256")
+    .update(`${kind}:${stamp}:${rand}`)
+    .digest("hex")
+    .slice(0, 16);
+  return `${kind}_${stamp}_${hash}`;
+}
+
+export function signUpload(kind: SignKind, _filename?: string) {
+  const rules = KIND_RULES[kind];
   const timestamp = Math.floor(Date.now() / 1000);
-  const folder =
-    kind === "entryVideo"
-      ? "bobo/videos"
-      : kind === "birthCertificate"
-        ? "bobo/certificates"
-        : kind === "cbcReceipt"
-          ? "bobo/receipts"
-          : "bobo/media";
+  const publicId = securePublicId(kind);
 
   const params: Record<string, string | number> = {
     timestamp,
-    folder,
+    folder: rules.folder,
+    public_id: publicId,
+    allowed_formats: rules.allowedFormats,
   };
-
-  if (filename) {
-    const base = filename.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 40);
-    params.public_id = `${base}_${timestamp}`;
-  }
 
   const signature = cloudinary.utils.api_sign_request(
     params,
@@ -46,8 +84,10 @@ export function signUpload(kind: SignKind, filename?: string) {
     apiKey: process.env.CLOUDINARY_API_KEY || "",
     timestamp,
     signature,
-    folder: String(params.folder),
-    publicId: params.public_id ? String(params.public_id) : undefined,
-    resourceType: kind === "entryVideo" ? ("video" as const) : ("auto" as const),
+    folder: rules.folder,
+    publicId,
+    resourceType: rules.resourceType,
+    allowedFormats: rules.allowedFormats,
+    maxBytes: rules.maxBytes,
   };
 }

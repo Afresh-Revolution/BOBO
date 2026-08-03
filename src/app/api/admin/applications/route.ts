@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { getAdminFromCookies } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/security/admin-api";
 import { jsonError, jsonOk } from "@/lib/api";
 import { serializeApplication } from "@/lib/serializers";
 import {
@@ -9,8 +9,9 @@ import {
 
 export async function GET(req: Request) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");

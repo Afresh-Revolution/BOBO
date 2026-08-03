@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/db";
-import { getAdminFromCookies } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/security/admin-api";
 import { jsonError, jsonOk } from "@/lib/api";
 import { revalidatePublicSite } from "@/lib/revalidate-site";
+import { writeAudit } from "@/lib/security/audit";
 import type { Prisma } from "@prisma/client";
 
 type RouteContext = { params: Promise<{ sectionKey: string }> };
@@ -48,8 +49,9 @@ function serializeCms(section: {
 
 export async function PUT(req: Request, ctx: RouteContext) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const { sectionKey } = await ctx.params;
     if (!sectionKey) return jsonError("sectionKey is required.", 400);
@@ -106,6 +108,14 @@ export async function PUT(req: Request, ctx: RouteContext) {
     });
 
     revalidatePublicSite();
+    await writeAudit({
+      adminId: admin.id,
+      action: "cms.update",
+      entity: "WebsiteContent",
+      entityId: sectionKey,
+      req,
+      meta: { title },
+    });
     return jsonOk({ data: serializeCms(saved) });
   } catch (err) {
     console.error("[admin/cms/sectionKey]", err);
@@ -113,10 +123,10 @@ export async function PUT(req: Request, ctx: RouteContext) {
   }
 }
 
-export async function GET(_req: Request, ctx: RouteContext) {
+export async function GET(req: Request, ctx: RouteContext) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
 
     const { sectionKey } = await ctx.params;
     const section = await prisma.websiteContent.findUnique({

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { getAdminFromCookies } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/security/admin-api";
 import { jsonError, jsonOk, clientIp } from "@/lib/api";
 import { parseIdList } from "@/lib/admin-bulk";
 import { cloudinary } from "@/lib/cloudinary";
@@ -11,8 +11,9 @@ function resourceTypeForKind(kind: string) {
 
 export async function POST(req: Request) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const body = await req.json().catch(() => null);
     const ids = parseIdList(body);

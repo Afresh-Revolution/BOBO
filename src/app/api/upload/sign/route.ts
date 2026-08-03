@@ -2,6 +2,8 @@ import { signUpload, type SignKind } from "@/lib/cloudinary";
 import { getAdminFromCookies, hashToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { jsonError, jsonOk, rateLimit, clientIp } from "@/lib/api";
+import { assertSameOrigin } from "@/lib/security/csrf";
+import { assertPermission } from "@/lib/security/rbac";
 
 const ALL_KINDS = new Set<SignKind>([
   "birthCertificate",
@@ -12,6 +14,9 @@ const ALL_KINDS = new Set<SignKind>([
 
 export async function POST(req: Request) {
   try {
+    const csrf = assertSameOrigin(req);
+    if (csrf) return csrf;
+
     const ip = clientIp(req);
     const limited = rateLimit(`upload:sign:${ip}`, 30, 60_000);
     if (!limited.ok) {
@@ -33,6 +38,9 @@ export async function POST(req: Request) {
       const admin = await getAdminFromCookies();
       if (!admin) {
         return jsonError("Admin sign-in required to upload media.", 401);
+      }
+      if (!assertPermission(admin, "manage_media")) {
+        return jsonError("Forbidden: insufficient permissions.", 403);
       }
     }
 

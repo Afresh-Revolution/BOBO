@@ -100,6 +100,7 @@ export function AcceptClient() {
   const [state, setState] = useState<AcceptStatus>("loading");
   const [data, setData] = useState<AcceptPayload | null>(null);
   const [fullName, setFullName] = useState("");
+  const [website, setWebsite] = useState("");
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [uploadPercent, setUploadPercent] = useState<number | null>(null);
@@ -206,6 +207,7 @@ export function AcceptClient() {
           body: JSON.stringify({
             fullName: trimmed,
             receipt,
+            website,
           }),
         },
       );
@@ -385,6 +387,18 @@ export function AcceptClient() {
 
           {state === "valid" ? (
             <form className={styles.form} onSubmit={onSubmit} noValidate>
+              <div className={styles.hp} aria-hidden="true">
+                <label htmlFor="company-website">Website</label>
+                <input
+                  id="company-website"
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                />
+              </div>
               <label className={styles.field}>
                 <span>Full name</span>
                 <input

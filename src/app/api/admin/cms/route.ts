@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { getAdminFromCookies } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/security/admin-api";
 import { jsonError, jsonOk } from "@/lib/api";
 import { revalidatePublicSite } from "@/lib/revalidate-site";
 import { ensureLandingCmsSections } from "@/lib/ensure-landing-cms";
@@ -48,10 +48,11 @@ function serializeCms(section: {
   };
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     await ensureLandingCmsSections();
 
@@ -68,8 +69,9 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const body = (await req.json().catch(() => null)) as {
       sections?: { key: string; title?: string; content?: CmsContent }[];

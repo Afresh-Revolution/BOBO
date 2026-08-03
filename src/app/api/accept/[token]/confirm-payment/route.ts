@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/db";
 import { hashToken } from "@/lib/auth";
-import { jsonError, jsonOk } from "@/lib/api";
+import { jsonError, jsonOk, rateLimit, clientIp } from "@/lib/api";
 import { registrationFee } from "@/lib/content";
+import { assertSameOrigin } from "@/lib/security/csrf";
+import { assertHumanSubmission } from "@/lib/security/bot-guard";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 
@@ -20,13 +22,24 @@ const bodySchema = z.object({
   fullName: z.string().trim().min(2, "Full name is required.").max(120),
   receipt: receiptSchema,
   reference: z.string().trim().max(120).optional(),
+  website: z.string().max(0).optional(),
+  turnstileToken: z.string().max(2048).optional(),
 });
 
 export async function POST(req: Request, ctx: RouteContext) {
   try {
+    const csrf = assertSameOrigin(req);
+    if (csrf) return csrf;
+
     const { token } = await ctx.params;
     if (!token) {
       return jsonError("Invalid link.", 404, { status: "invalid" });
+    }
+
+    const ip = clientIp(req);
+    const limited = rateLimit(`accept:confirm:${ip}`, 10, 60 * 60 * 1000);
+    if (!limited.ok) {
+      return jsonError("Too many payment confirmations. Try again later.", 429);
     }
 
     const rawBody = await req.json().catch(() => null);
@@ -38,7 +51,11 @@ export async function POST(req: Request, ctx: RouteContext) {
       );
     }
 
-    const { fullName, receipt, reference: clientRef } = parsed.data;
+    const { fullName, receipt, reference: clientRef, website, turnstileToken } =
+      parsed.data;
+
+    const bot = await assertHumanSubmission({ website, turnstileToken });
+    if (bot) return bot;
 
     const tokenHash = hashToken(token);
     const link = await prisma.magicLink.findFirst({

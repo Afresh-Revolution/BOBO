@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/db";
 import {
-  getAdminFromCookies,
   hashPassword,
   requireRole,
 } from "@/lib/auth";
+import { requireAdminApi } from "@/lib/security/admin-api";
+import { validatePasswordStrength } from "@/lib/security/password";
 import { jsonError, jsonOk, clientIp } from "@/lib/api";
 
 type AdminRole = "SUPER_ADMIN" | "ADMIN" | "EDITOR" | "VIEWER";
@@ -15,10 +16,11 @@ const ROLES = new Set<AdminRole>([
   "VIEWER",
 ]);
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     const admins = await prisma.admin.findMany({
       where: { isActive: true },
@@ -63,8 +65,9 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const admin = await getAdminFromCookies();
-    if (!admin) return jsonError("Unauthorized", 401);
+    const gated = await requireAdminApi(req);
+    if (gated instanceof Response) return gated;
+    const { admin } = gated;
 
     if (!requireRole(admin, ["SUPER_ADMIN"])) {
       return jsonError("Only SUPER_ADMIN can create admins.", 403);
@@ -85,8 +88,9 @@ export async function POST(req: Request) {
     if (!email || !password || !fullName) {
       return jsonError("email, password, and fullName are required.", 400);
     }
-    if (password.length < 8) {
-      return jsonError("Password must be at least 8 characters.", 400);
+    const strength = validatePasswordStrength(password);
+    if (!strength.ok) {
+      return jsonError(strength.message || "Password is too weak.", 400);
     }
     if (!ROLES.has(role)) {
       return jsonError("Invalid role.", 400);
