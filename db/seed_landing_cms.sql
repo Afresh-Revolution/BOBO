@@ -237,6 +237,20 @@ VALUES
   '{}'::jsonb,
   NOW(),
   NOW()
+),
+(
+  gen_random_uuid()::text,
+  'gallery',
+  'Gallery',
+  'Moments from the stage.',
+  'Browse albums from seasons, casting, and behind the scenes.',
+  'Open gallery',
+  '/gallery',
+  8,
+  TRUE,
+  '{"pageTitle":"The gallery","pageDescription":"Albums from the BOBO world — seasons, casting, and moments off-camera."}'::jsonb,
+  NOW(),
+  NOW()
 )
 -- Insert missing sections only — never overwrite CMS edits already in the DB
 ON CONFLICT ("sectionKey") DO NOTHING;

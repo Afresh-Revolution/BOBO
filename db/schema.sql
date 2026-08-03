@@ -410,6 +410,14 @@ ALTER TABLE network_partners ADD COLUMN IF NOT EXISTS logo_url TEXT;
 ALTER TABLE network_partners ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0;
 ALTER TABLE network_partners ADD COLUMN IF NOT EXISTS is_published BOOLEAN DEFAULT TRUE;
 ALTER TABLE network_partners ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+ALTER TABLE network_partners ALTER COLUMN created_at SET DEFAULT NOW();
+ALTER TABLE network_partners ALTER COLUMN updated_at SET DEFAULT NOW();
+UPDATE network_partners
+SET updated_at = COALESCE(updated_at, created_at, NOW())
+WHERE updated_at IS NULL;
+UPDATE network_partners
+SET created_at = COALESCE(created_at, NOW())
+WHERE created_at IS NULL;
 
 CREATE INDEX IF NOT EXISTS network_partners_published_sort_idx
   ON network_partners (is_published, sort_order ASC, created_at ASC)
@@ -432,6 +440,78 @@ FROM network_partners
 WHERE is_published = TRUE
   AND deleted_at IS NULL
 ORDER BY sort_order ASC, created_at ASC;
+
+-- ---------------------------------------------------------------------------
+-- Gallery albums + images
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS gallery_albums (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title         TEXT NOT NULL,
+  slug          TEXT NOT NULL,
+  description   TEXT,
+  cover_url     TEXT,
+  sort_order    INTEGER NOT NULL DEFAULT 0,
+  is_published  BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  deleted_at    TIMESTAMPTZ
+);
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'gallery_albums_slug_key'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM pg_class
+    WHERE relname = 'gallery_albums_slug_key'
+  ) THEN
+    ALTER TABLE gallery_albums
+      ADD CONSTRAINT gallery_albums_slug_key UNIQUE (slug);
+  END IF;
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+  WHEN duplicate_table THEN NULL;
+END $$;
+
+CREATE INDEX IF NOT EXISTS gallery_albums_published_sort_idx
+  ON gallery_albums (is_published, sort_order ASC, created_at ASC)
+  WHERE deleted_at IS NULL;
+
+ALTER TABLE gallery_albums ALTER COLUMN created_at SET DEFAULT NOW();
+ALTER TABLE gallery_albums ALTER COLUMN updated_at SET DEFAULT NOW();
+
+DROP TRIGGER IF EXISTS gallery_albums_set_updated_at ON gallery_albums;
+CREATE TRIGGER gallery_albums_set_updated_at
+  BEFORE UPDATE ON gallery_albums
+  FOR EACH ROW
+  EXECUTE PROCEDURE set_updated_at();
+
+CREATE TABLE IF NOT EXISTS gallery_images (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  album_id      UUID NOT NULL REFERENCES gallery_albums(id) ON DELETE CASCADE,
+  image_url     TEXT NOT NULL,
+  caption       TEXT,
+  alt           TEXT,
+  sort_order    INTEGER NOT NULL DEFAULT 0,
+  is_published  BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  deleted_at    TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS gallery_images_album_sort_idx
+  ON gallery_images (album_id, sort_order ASC, created_at ASC)
+  WHERE deleted_at IS NULL;
+
+ALTER TABLE gallery_images ALTER COLUMN created_at SET DEFAULT NOW();
+ALTER TABLE gallery_images ALTER COLUMN updated_at SET DEFAULT NOW();
+
+DROP TRIGGER IF EXISTS gallery_images_set_updated_at ON gallery_images;
+CREATE TRIGGER gallery_images_set_updated_at
+  BEFORE UPDATE ON gallery_images
+  FOR EACH ROW
+  EXECUTE PROCEDURE set_updated_at();
 
 -- ---------------------------------------------------------------------------
 -- Seeds: insert missing defaults only — never overwrite existing CMS / partners
@@ -461,7 +541,9 @@ BEGIN
        '{"cards":[{"title":"Presence","body":"How you carry yourself on camera: composure, polish, and poise."},{"title":"Substance","body":"Clarity of thought. Purpose. The depth behind the presentation."},{"title":"Character","body":"Grace under pressure, integrity, and how you treat the room."},{"title":"Style","body":"Personal aesthetic that feels intentional, never try-hard."}]}'::jsonb),
       ('faq', 'FAQ', 'Answers, without the fluff.', 'Everything applicants ask before hitting submit.', NULL, NULL, 6,
        '{"items":[{"q":"Who can apply?","a":"Nigerian nationals aged 18-38 with a CBrilliance account and at least 2,000 followers on one social platform (excluding Facebook)."},{"q":"What should my entry video include?","a":"Introduce yourself (name and state), show a full-body recording, and answer one of the four prompt questions. Max 2 minutes, 100MB, MP4/MOV/AVI only."},{"q":"Is there a registration fee?","a":"Only approved applicants can register. The fee is 5 CBC (approx. ₦150,000). Payment is an investment into the CBC exchange ecosystem via cbcnets.com."},{"q":"Where does voting happen?","a":"Voting is not on this site. It takes place on popin.club. You need a CBrilliance account to vote."},{"q":"How many contestants make the show?","a":"20 baddies, 1 week, 1 crown, 1 winner."},{"q":"What happens after I apply?","a":"You will receive a confirmation. If approved, a secure single-use email link arrives (valid for 48 hours) to complete registration."}]}'::jsonb),
-      ('sponsors', 'The Network', 'Powered by the ecosystem.', 'CBrilliance, Popin, and CBC Nets — identity, voting, and registration in one network.', NULL, NULL, 7, '{}'::jsonb)
+      ('sponsors', 'The Network', 'Powered by the ecosystem.', 'CBrilliance, Popin, and CBC Nets — identity, voting, and registration in one network.', NULL, NULL, 7, '{}'::jsonb),
+      ('gallery', 'Gallery', 'Moments from the stage.', 'Browse albums from seasons, casting, and behind the scenes.', 'Open gallery', '/gallery', 8,
+       '{"pageTitle":"The gallery","pageDescription":"Albums from the BOBO world — seasons, casting, and moments off-camera."}'::jsonb)
     ON CONFLICT (section_key) DO NOTHING;
   END IF;
 END $$;
@@ -508,7 +590,9 @@ BEGIN
          '{"cards":[{"title":"Presence","body":"How you carry yourself on camera: composure, polish, and poise."},{"title":"Substance","body":"Clarity of thought. Purpose. The depth behind the presentation."},{"title":"Character","body":"Grace under pressure, integrity, and how you treat the room."},{"title":"Style","body":"Personal aesthetic that feels intentional, never try-hard."}]}'::jsonb),
         ('faq', 'FAQ', 'Answers, without the fluff.', 'Everything applicants ask before hitting submit.', NULL, NULL, 6,
          '{"items":[{"q":"Who can apply?","a":"Nigerian nationals aged 18-38 with a CBrilliance account and at least 2,000 followers on one social platform (excluding Facebook)."},{"q":"What should my entry video include?","a":"Introduce yourself (name and state), show a full-body recording, and answer one of the four prompt questions. Max 2 minutes, 100MB, MP4/MOV/AVI only."},{"q":"Is there a registration fee?","a":"Only approved applicants can register. The fee is 5 CBC (approx. ₦150,000). Payment is an investment into the CBC exchange ecosystem via cbcnets.com."},{"q":"Where does voting happen?","a":"Voting is not on this site. It takes place on popin.club. You need a CBrilliance account to vote."},{"q":"How many contestants make the show?","a":"20 baddies, 1 week, 1 crown, 1 winner."},{"q":"What happens after I apply?","a":"You will receive a confirmation. If approved, a secure single-use email link arrives (valid for 48 hours) to complete registration."}]}'::jsonb),
-        ('sponsors', 'The Network', 'Powered by the ecosystem.', 'CBrilliance, Popin, and CBC Nets — identity, voting, and registration in one network.', NULL, NULL, 7, '{}'::jsonb)
+        ('sponsors', 'The Network', 'Powered by the ecosystem.', 'CBrilliance, Popin, and CBC Nets — identity, voting, and registration in one network.', NULL, NULL, 7, '{}'::jsonb),
+        ('gallery', 'Gallery', 'Moments from the stage.', 'Browse albums from seasons, casting, and behind the scenes.', 'Open gallery', '/gallery', 8,
+         '{"pageTitle":"The gallery","pageDescription":"Albums from the BOBO world — seasons, casting, and moments off-camera."}'::jsonb)
     ) AS v(section_key, title, subtitle, body, cta_label, cta_href, sort_order, meta)
     WHERE NOT EXISTS (
       SELECT 1 FROM website_content wc
@@ -518,8 +602,10 @@ BEGIN
 END $$;
 
 -- Network partners: add defaults only if name is missing (never overwrite)
-INSERT INTO network_partners (name, href, logo_url, sort_order, is_published)
-SELECT v.name, v.href, NULL, v.sort_order, TRUE
+INSERT INTO network_partners (
+  name, href, logo_url, sort_order, is_published, created_at, updated_at
+)
+SELECT v.name, v.href, NULL, v.sort_order, TRUE, NOW(), NOW()
 FROM (
   VALUES
     ('CBrilliance', 'https://cbrilliance.io', 0),

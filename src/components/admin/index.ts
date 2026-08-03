@@ -6,5 +6,6 @@ export { BulkSelectBar } from "./BulkSelectBar";
 export { ConfirmProvider, useConfirm } from "./ConfirmDialog";
 export type { ConfirmAsk, ConfirmOptions } from "./ConfirmDialog";
 export { AdminImageUpload } from "./AdminImageUpload";
+export { AdminMultiImageUpload } from "./AdminMultiImageUpload";
 export { StatusBadge } from "./StatusBadge";
 export { AdminButton } from "./AdminButton";

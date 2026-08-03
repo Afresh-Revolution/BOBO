@@ -5,11 +5,11 @@ import { siteConfig } from "@/lib/content";
 import styles from "./Footer.module.scss";
 
 const footerNav = [
-  { href: "#about", label: "About" },
-  { href: "#timeline", label: "Timeline" },
-  { href: "#apply", label: "How to Apply" },
-  { href: "#eligibility", label: "Eligibility" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/#about", label: "About" },
+  { href: "/#timeline", label: "Timeline" },
+  { href: "/#apply", label: "How to Apply" },
+  { href: "/gallery", label: "Gallery" },
+  { href: "/#faq", label: "FAQ" },
 ];
 
 const socialLinks = [

@@ -6,21 +6,24 @@ import { Eligibility } from "@/components/landing/Eligibility";
 import { Judging } from "@/components/landing/Judging";
 import { FAQ } from "@/components/landing/FAQ";
 import { Sponsors } from "@/components/landing/Sponsors";
+import { GalleryTeaser } from "@/components/landing/GalleryTeaser";
 import { getPublishedCms } from "@/lib/cms";
 import { resolveLandingCopy } from "@/lib/cms-landing";
 import { getPublishedWinners } from "@/lib/winners";
 import { getPublishedNetworkPartners } from "@/lib/partners";
+import { getGalleryTeaserImages } from "@/lib/gallery";
 import { getPortalSettings } from "@/lib/portal";
 import { siteConfig } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [cms, winners, partners, portal] = await Promise.all([
+  const [cms, winners, partners, portal, galleryPreviews] = await Promise.all([
     getPublishedCms(),
     getPublishedWinners(),
     getPublishedNetworkPartners(),
     getPortalSettings(),
+    getGalleryTeaserImages(4),
   ]);
 
   const landing = resolveLandingCopy(cms);
@@ -142,6 +145,14 @@ export default async function HomePage() {
         title={landing.faq.title}
         description={landing.faq.description}
         items={faqItems}
+      />
+      <GalleryTeaser
+        eyebrow={landing.gallery.eyebrow}
+        title={landing.gallery.title}
+        description={landing.gallery.description}
+        ctaLabel={landing.gallery.ctaLabel}
+        ctaHref={landing.gallery.ctaHref}
+        previewUrls={galleryPreviews}
       />
       <Sponsors
         eyebrow={landing.sponsors.eyebrow}

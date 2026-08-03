@@ -9,11 +9,11 @@ import { siteConfig } from "@/lib/content";
 import styles from "./Header.module.scss";
 
 const nav = [
-  { href: "#about", label: "About" },
-  { href: "#timeline", label: "Timeline" },
-  { href: "#apply", label: "Apply" },
-  { href: "#eligibility", label: "Eligibility" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/#about", label: "About" },
+  { href: "/#timeline", label: "Timeline" },
+  { href: "/#apply", label: "Apply" },
+  { href: "/gallery", label: "Gallery" },
+  { href: "/#faq", label: "FAQ" },
 ];
 
 type HeaderProps = {

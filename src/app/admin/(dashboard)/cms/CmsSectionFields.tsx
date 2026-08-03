@@ -29,6 +29,8 @@ export type SectionDraft = {
   eligibilitySecondaryCtaHref: string;
   judgingCards: { title: string; body: string }[];
   faqItems: { q: string; a: string }[];
+  pageTitle: string;
+  pageDescription: string;
 };
 
 function asString(value: unknown, fallback = "") {
@@ -185,6 +187,14 @@ export function draftFromContent(
             }))
           : fallbackFaq
         : [],
+    pageTitle: asString(
+      sectionKey === "gallery" ? merged.pageTitle : "",
+      asString(metaDefaults.pageTitle),
+    ),
+    pageDescription: asString(
+      sectionKey === "gallery" ? merged.pageDescription : "",
+      asString(metaDefaults.pageDescription),
+    ),
   };
 }
 
@@ -272,6 +282,14 @@ export function contentFromDraft(
     return {
       ...base,
       items: draft.faqItems.map((item) => ({ q: item.q, a: item.a })),
+    };
+  }
+
+  if (key === "gallery") {
+    return {
+      ...base,
+      pageTitle: draft.pageTitle || null,
+      pageDescription: draft.pageDescription || null,
     };
   }
 
@@ -735,13 +753,56 @@ export function CmsSectionFields({ sectionKey, draft, onChange }: Props) {
         </div>
       ) : null}
 
-      <div className={styles.field}>
-        <AdminImageUpload
-          label="Image (optional)"
-          value={draft.imageUrl || null}
-          onChange={(url) => onChange({ imageUrl: url ?? "" })}
-        />
-      </div>
+      {sectionKey === "gallery" ? (
+        <>
+          <label className={styles.field}>
+            <span>Teaser CTA label</span>
+            <input
+              className={styles.input}
+              value={draft.ctaLabel}
+              onChange={(e) => onChange({ ctaLabel: e.target.value })}
+            />
+          </label>
+          <label className={styles.field}>
+            <span>Teaser CTA link</span>
+            <input
+              className={styles.input}
+              value={draft.ctaHref}
+              onChange={(e) => onChange({ ctaHref: e.target.value })}
+              placeholder="/gallery"
+            />
+          </label>
+          <label className={styles.field}>
+            <span>/gallery page heading</span>
+            <input
+              className={styles.input}
+              value={draft.pageTitle}
+              onChange={(e) => onChange({ pageTitle: e.target.value })}
+            />
+          </label>
+          <label className={styles.field}>
+            <span>/gallery page description</span>
+            <textarea
+              className={styles.textarea}
+              value={draft.pageDescription}
+              onChange={(e) => onChange({ pageDescription: e.target.value })}
+            />
+          </label>
+          <p className={styles.muted}>
+            Albums and images are managed under Admin → Gallery.
+          </p>
+        </>
+      ) : null}
+
+      {sectionKey !== "gallery" ? (
+        <div className={styles.field}>
+          <AdminImageUpload
+            label="Image (optional)"
+            value={draft.imageUrl || null}
+            onChange={(url) => onChange({ imageUrl: url ?? "" })}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

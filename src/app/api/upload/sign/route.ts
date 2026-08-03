@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     if (csrf) return csrf;
 
     const ip = clientIp(req);
-    const limited = rateLimit(`upload:sign:${ip}`, 30, 60_000);
+    const limited = rateLimit(`upload:sign:${ip}`, 80, 60_000);
     if (!limited.ok) {
       return jsonError("Too many upload requests. Try again shortly.", 429);
     }

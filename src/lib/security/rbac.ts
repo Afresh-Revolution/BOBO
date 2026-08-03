@@ -76,7 +76,8 @@ export function permissionForAdminPath(
   if (
     pathname.includes("/cms") ||
     pathname.includes("/winners") ||
-    pathname.includes("/partners")
+    pathname.includes("/partners") ||
+    pathname.includes("/gallery")
   ) {
     return isMutating ? "manage_cms" : "read";
   }

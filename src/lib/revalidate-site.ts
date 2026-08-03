@@ -5,4 +5,5 @@ export function revalidatePublicSite() {
   revalidatePath("/", "layout");
   revalidatePath("/");
   revalidatePath("/apply");
+  revalidatePath("/gallery");
 }

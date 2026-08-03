@@ -90,6 +90,15 @@ export type LandingCopy = {
     title: string;
     description: string;
   };
+  gallery: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    ctaLabel: string;
+    ctaHref: string;
+    pageTitle: string;
+    pageDescription: string;
+  };
 };
 
 function asString(value: unknown, fallback = "") {
@@ -189,6 +198,7 @@ export function resolveLandingCopy(
   const judging = section(cms, "judging");
   const faq = section(cms, "faq");
   const sponsors = section(cms, "sponsors");
+  const gallery = section(cms, "gallery");
 
   const heroMeta = hero?.meta ?? {};
   const aboutMeta = about?.meta ?? {};
@@ -197,6 +207,7 @@ export function resolveLandingCopy(
   const eligibilityMeta = eligibility?.meta ?? {};
   const judgingMeta = judging?.meta ?? {};
   const faqMeta = faq?.meta ?? {};
+  const galleryMeta = gallery?.meta ?? {};
 
   return {
     hero: {
@@ -281,6 +292,20 @@ export function resolveLandingCopy(
       description:
         sponsors?.body ||
         "CBrilliance, Popin, and CBC Nets — identity, voting, and registration in one network.",
+    },
+    gallery: {
+      eyebrow: gallery?.title || "Gallery",
+      title: gallery?.subtitle || "Moments from the stage.",
+      description:
+        gallery?.body ||
+        "Browse albums from seasons, casting, and behind the scenes.",
+      ctaLabel: gallery?.ctaLabel || "Open gallery",
+      ctaHref: gallery?.ctaHref || "/gallery",
+      pageTitle: asString(galleryMeta.pageTitle, "The gallery"),
+      pageDescription: asString(
+        galleryMeta.pageDescription,
+        "Albums from the BOBO world — seasons, casting, and moments off-camera.",
+      ),
     },
   };
 }

@@ -16,10 +16,9 @@ function allowedOrigins() {
       // ignore invalid
     }
   }
-  if (process.env.NODE_ENV !== "production") {
-    origins.add("http://localhost:3000");
-    origins.add("http://127.0.0.1:3000");
-  }
+  // Always allow local Next on :3000 (dev and `next start` locally).
+  origins.add("http://localhost:3000");
+  origins.add("http://127.0.0.1:3000");
   return origins;
 }
 

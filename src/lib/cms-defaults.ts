@@ -9,6 +9,7 @@ export const LANDING_SECTION_KEYS = [
   "judging",
   "faq",
   "sponsors",
+  "gallery",
 ] as const;
 
 export type LandingSectionKey = (typeof LANDING_SECTION_KEYS)[number];
@@ -22,6 +23,7 @@ export const LANDING_SECTION_LABELS: Record<LandingSectionKey, string> = {
   judging: "Judging",
   faq: "FAQ",
   sponsors: "Sponsors / Network",
+  gallery: "Gallery",
 };
 
 export const LANDING_SECTION_HINTS: Record<LandingSectionKey, string> = {
@@ -33,6 +35,7 @@ export const LANDING_SECTION_HINTS: Record<LandingSectionKey, string> = {
   judging: "Judging criteria cards.",
   faq: "Questions and answers accordion.",
   sponsors: "Partners section header (partner cards are below).",
+  gallery: "Landing gallery teaser copy and button to /gallery. Albums/images are managed under Admin → Gallery.",
 };
 
 export const defaultLandingSections = [
@@ -223,5 +226,19 @@ export const defaultLandingSections = [
     body: "CBrilliance, Popin, and CBC Nets — identity, voting, and registration in one network.",
     sortOrder: 7,
     meta: {},
+  },
+  {
+    sectionKey: "gallery",
+    title: "Gallery",
+    subtitle: "Moments from the stage.",
+    body: "Browse albums from seasons, casting, and behind the scenes.",
+    ctaLabel: "Open gallery",
+    ctaHref: "/gallery",
+    sortOrder: 8,
+    meta: {
+      pageTitle: "The gallery",
+      pageDescription:
+        "Albums from the BOBO world — seasons, casting, and moments off-camera.",
+    },
   },
 ] as const;
