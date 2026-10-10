@@ -20,12 +20,12 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       // Next.js / React still need inline for hydration in many setups
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com",
       "style-src 'self' 'unsafe-inline' https://api.fontshare.com",
       "font-src 'self' https://cdn.fontshare.com data:",
       "img-src 'self' data: blob: https://res.cloudinary.com",
       "media-src 'self' blob: https://res.cloudinary.com",
-      "connect-src 'self' https://api.cloudinary.com https://res.cloudinary.com",
+      "connect-src 'self' https://api.cloudinary.com https://res.cloudinary.com https://cloudflareinsights.com",
       "object-src 'none'",
       "frame-ancestors 'none'",
       "base-uri 'self'",
