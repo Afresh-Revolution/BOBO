@@ -26,6 +26,8 @@ jobs:
           key: ${{ secrets.VPS_SECRET }}
           script: |
             set -e
+            export BUN_INSTALL="$HOME/.bun"
+            export PATH="$BUN_INSTALL/bin:$PATH"
             cd /root/afresh/BOBO
             git fetch --all
             git reset --hard origin/main
