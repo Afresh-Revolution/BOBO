@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import gsap from "gsap";
 import { Button } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/content";
+import { predictHeadline, predictPath, predictVideoSrc } from "@/lib/predict";
 import type { SeasonWinner } from "@/lib/winners-shared";
 import { WinnersSlideshow } from "./WinnersSlideshow";
 import styles from "./Hero.module.scss";
@@ -142,6 +143,21 @@ export function Hero({
         >
           <WinnersSlideshow winners={winners} />
         </motion.div>
+      </div>
+
+      <div className={styles.predict}>
+        <video
+          className={styles.predictVideo}
+          controls
+          playsInline
+          preload="metadata"
+          src={predictVideoSrc}
+          aria-label="BOBO Edition 2 prediction"
+        />
+        <p className={styles.predictCaption}>{predictHeadline}</p>
+        <Button href={predictPath} variant="gold" size="md">
+          Read more
+        </Button>
       </div>
 
       <a href="#about" className={styles.scroll} aria-label="Scroll to about">

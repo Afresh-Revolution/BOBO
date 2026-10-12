@@ -1,22 +1,28 @@
 .hero {
+  --predict-width: min(92vw, 26rem);
+  /* Half the card: video is 16:9, plus caption and button. */
+  --predict-overhang: calc(var(--predict-width) * 0.28 + 6rem);
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
   display: grid;
   align-items: end;
-  overflow: clip;
+  overflow: visible;
   background: #0a0612;
   color: var(--bobo-white);
   padding-top: var(--header-h);
-  /* Keep CTAs clear of Safari’s bottom chrome (+10px lift on mobile) */
+  /* Room inside the hero for the half of the card that sits on it. */
   padding-bottom: calc(
-    clamp(3.5rem, 8vh, 5.5rem) + env(safe-area-inset-bottom, 0px) + 10px
+    var(--predict-overhang) + 1.25rem + env(safe-area-inset-bottom, 0px)
   );
+  /* Room below the hero for the half that hangs off it. */
+  margin-bottom: var(--predict-overhang);
 }
 
 .atmosphere {
   position: absolute;
   inset: 0;
+  overflow: clip;
   pointer-events: none;
 }
 
@@ -105,6 +111,42 @@
   justify-items: center;
 }
 
+.predict {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 3;
+  transform: translate(-50%, 50%);
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  width: var(--predict-width);
+  padding: 0.7rem 0.7rem 1rem;
+  text-align: center;
+  background: #12081c;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 1.15rem;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.4);
+}
+
+.predictVideo {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  background: #000;
+}
+
+.predictCaption {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 0.8rem + 0.6vw, 1.15rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  color: var(--bobo-gold);
+}
+
 .brandBlock {
   display: grid;
   gap: 0.85rem;
@@ -172,7 +214,7 @@
 .scroll {
   position: absolute;
   right: var(--gutter);
-  bottom: 2rem;
+  bottom: calc(var(--predict-overhang) + 1.5rem);
   display: none;
   flex-direction: column;
   align-items: center;
@@ -208,7 +250,7 @@
 @media (min-width: 900px) {
   .hero {
     align-items: center;
-    padding-bottom: clamp(3.5rem, 8vh, 5.5rem);
+    padding-bottom: calc(var(--predict-overhang) + 1.5rem);
   }
 
   .stage {
